@@ -1,0 +1,39 @@
+# Nurse Stress Detection - local environment
+# Tested target: Python 3.11 on Windows
+# Install:  pip install -r requirements.txt
+
+# --- core ---
+numpy>=1.26,<2.1
+pandas>=2.1
+scipy>=1.11
+scikit-learn>=1.4
+joblib>=1.3
+
+# --- deep learning ---
+# TensorFlow drives 1d_cnn.ipynb and lstm_classifier_initial.ipynb
+tensorflow>=2.16,<2.18
+# PyTorch drives Mlp_global.ipynb, the LSTM scripts, and the per-nurse MLP
+torch>=2.2
+
+# --- gradient boosting / interpretability ---
+xgboost>=2.0
+shap>=0.44
+
+# --- imbalance handling (used in LogReg_global.ipynb: SMOTE) ---
+imbalanced-learn>=0.12
+
+# --- plotting ---
+matplotlib>=3.8
+seaborn>=0.13
+
+# --- notebooks ---
+jupyter>=1.0
+ipykernel>=6.29
+notebook>=7.1
+tqdm>=4.66
+
+# --- only needed if you run LogReg_global.ipynb, which pulls from Kaggle ---
+kagglehub>=0.3
+
+# --- only needed if you run scripts/generate_results_ppt.py ---
+python-pptx>=0.6.23

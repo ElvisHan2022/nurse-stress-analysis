@@ -1,0 +1,17 @@
+# The friend's repo — already its own git repository with ~935 MB of LFS
+# data. Never vendor it in here; clone it separately if you need it.
+reference/MLMAMidtermProject/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Editor / tool lock and cache files
+~$*.md
+~$*.docx
+
+# Session tooling, not part of the analysis
+.remember/
+.claude/

@@ -1,0 +1,16 @@
+sliding window	A technique that carves a continuous recording into overlapping fixed-length chunks, so each chunk becomes one sample.	ml::core ml::timeseries
+stride	How far a sliding window advances between one sample and the next.	ml::core ml::timeseries
+leakage	Information from the test set influencing training, which inflates the reported score and makes it meaningless.	ml::core ml::evaluation
+hyperparameter	A value you choose before training, such as window length, number of trees, or learning rate.	ml::core
+parameter	A value the model learns by itself during training, such as a network weight or a tree split threshold.	ml::core
+feature engineering	Constructing new input variables from existing ones because you believe they express the underlying phenomenon more directly.	ml::core
+z-score normalization	Rescaling a feature so it has mean 0 and standard deviation 1.	ml::core
+precision	Of all the cases the model called positive, the fraction that were actually positive.	ml::evaluation
+recall (sensitivity)	Of all the genuinely positive cases, the fraction the model caught.	ml::evaluation
+macro-F1	F1 computed separately for each class, then averaged with equal weight given to each class.	ml::evaluation ml::imbalance
+balanced accuracy	The unweighted mean of per-class recall.	ml::evaluation ml::imbalance
+bagging	Training many models on random subsamples of the data and averaging their votes, so their individual errors cancel.	ml::models
+boosting	Training models sequentially, where each new model is fit to the errors the previous ones are still making.	ml::models
+dropout	Randomly zeroing a fraction of neurons at each training step, so the network cannot depend on any single pathway.	ml::models
+censoring	Not observing the event of interest for a subject because the study ended before it happened.	ml::problemtypes
+self-supervised learning	Creating labels from the data itself, such as masking part of a signal and training the model to reconstruct it.	ml::problemtypes
