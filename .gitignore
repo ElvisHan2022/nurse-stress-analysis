@@ -15,3 +15,7 @@ __pycache__/
 # Session tooling, not part of the analysis
 .remember/
 .claude/
+
+# Pixi environment
+.pixi/
+.DS_Store
