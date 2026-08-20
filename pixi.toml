@@ -9,3 +9,10 @@ version = "0.1.0"
 
 [dependencies]
 python = "3.12.*"
+numpy = ">=2.5.2,<3"
+pandas = ">=3.0.5,<4"
+ipykernel = ">=7.3.0,<8"
+matplotlib = ">=3.11.1,<4"
+openpyxl = ">=3.1.5,<4"
+pyarrow = ">=25.0.0,<26"
+scikit-learn = ">=1.9.0,<2"
