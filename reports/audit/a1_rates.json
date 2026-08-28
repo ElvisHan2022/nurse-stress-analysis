@@ -1,0 +1,63 @@
+{
+  "native_rates": {
+    "ACC": 32.0,
+    "BVP": 64.0,
+    "EDA": 4.0,
+    "HR": 1.0,
+    "TEMP": 4.0
+  },
+  "candidate_rates": [
+    1,
+    4,
+    8,
+    16,
+    32
+  ],
+  "feasibility": [
+    {
+      "target_Hz": 1,
+      "ACC": "downsample",
+      "BVP": "downsample",
+      "EDA": "downsample",
+      "HR": "native",
+      "TEMP": "downsample",
+      "channels_real": 5
+    },
+    {
+      "target_Hz": 4,
+      "ACC": "downsample",
+      "BVP": "downsample",
+      "EDA": "native",
+      "HR": "UPSAMPLE x4",
+      "TEMP": "native",
+      "channels_real": 4
+    },
+    {
+      "target_Hz": 8,
+      "ACC": "downsample",
+      "BVP": "downsample",
+      "EDA": "UPSAMPLE x2",
+      "HR": "UPSAMPLE x8",
+      "TEMP": "UPSAMPLE x2",
+      "channels_real": 2
+    },
+    {
+      "target_Hz": 16,
+      "ACC": "downsample",
+      "BVP": "downsample",
+      "EDA": "UPSAMPLE x4",
+      "HR": "UPSAMPLE x16",
+      "TEMP": "UPSAMPLE x4",
+      "channels_real": 2
+    },
+    {
+      "target_Hz": 32,
+      "ACC": "native",
+      "BVP": "downsample",
+      "EDA": "UPSAMPLE x8",
+      "HR": "UPSAMPLE x32",
+      "TEMP": "UPSAMPLE x8",
+      "channels_real": 2
+    }
+  ]
+}

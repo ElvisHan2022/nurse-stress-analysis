@@ -1,0 +1,4 @@
+rule,entering,removed,surviving,hours_surviving
+drop sessions < 5 min,37252,32,37220,1240.7
+drop non-wear windows,37220,87,37133,1237.8
+drop dead-EDA sessions,37133,598,36535,1217.8

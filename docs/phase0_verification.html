@@ -1,0 +1,259 @@
+<title>Phase 0 Verification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* Palette and type carried from judgment_calls_guide.html so the two documents read as a set. */
+  :root{
+    --paper:#EEF1F3; --card:#FFFFFF; --ink:#17212B; --muted:#5B6B7A; --rule:#C3CBD2;
+    --signal:#2F6F9F; --withheld:#B8762A; --sealed:#6B5B95; --eval:#3F7D62; --alarm:#A8443C;
+    --chip-ink:#FFFFFF;
+    --display:'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --body:'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+    --mono:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#131A21; --card:#1A232C; --ink:#E3E9EE; --muted:#94A5B3; --rule:#2C3843;
+      --signal:#6BA8D4; --withheld:#D9A05B; --sealed:#9E8ECB; --eval:#6FB894; --alarm:#D4746B;
+      --chip-ink:#131A21;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#131A21; --card:#1A232C; --ink:#E3E9EE; --muted:#94A5B3; --rule:#2C3843;
+    --signal:#6BA8D4; --withheld:#D9A05B; --sealed:#9E8ECB; --eval:#6FB894; --alarm:#D4746B;
+    --chip-ink:#131A21;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--paper); color:var(--ink); font-family:var(--body);
+    font-size:16px; line-height:1.65; padding:44px 24px 90px;
+  }
+  .wrap{max-width:820px; margin:0 auto; display:flex; flex-direction:column; gap:0}
+
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted); margin:0 0 6px;
+  }
+  h1{
+    font-family:var(--display); font-weight:700; font-size:clamp(28px,4.4vw,40px); line-height:1.1;
+    letter-spacing:-.018em; margin:0 0 14px; text-wrap:balance;
+  }
+  .lede{color:var(--muted); font-size:17px; margin:0 0 4px; max-width:62ch}
+  .meta{
+    font-family:var(--mono); font-size:11.5px; color:var(--muted);
+    display:flex; flex-wrap:wrap; gap:18px; margin:22px 0 0;
+    padding-top:16px; border-top:1px solid var(--rule);
+  }
+  .meta span b{color:var(--ink); font-weight:600}
+
+  h2{
+    font-family:var(--display); font-weight:700; font-size:22px; margin:54px 0 6px;
+    letter-spacing:-.012em; text-wrap:balance;
+  }
+  h3{font-family:var(--display); font-weight:700; font-size:16px; margin:28px 0 6px}
+  p{margin:0 0 15px; max-width:66ch}
+  ul{margin:0 0 15px; padding-left:20px; max-width:66ch}
+  li{margin-bottom:8px}
+  strong{font-weight:600}
+  code{
+    font-family:var(--mono); font-size:.86em; background:var(--card);
+    border:1px solid var(--rule); padding:1px 5px; border-radius:2px;
+  }
+
+  .summary{
+    background:var(--card); border:1px solid var(--rule); border-radius:3px;
+    padding:20px 22px; margin:14px 0 0;
+  }
+  .summary p{margin:0 0 12px} .summary p:last-child{margin:0}
+
+  .flag{
+    background:var(--card); border-left:3px solid var(--alarm); padding:16px 20px;
+    margin:20px 0; border-radius:0 3px 3px 0;
+  }
+  .flag p{margin:0 0 10px} .flag p:last-child{margin:0}
+  .flag b.tag{
+    font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--alarm); display:block; margin-bottom:6px; font-weight:600;
+  }
+  .note{
+    background:var(--card); border-left:3px solid var(--sealed); padding:16px 20px;
+    margin:20px 0; border-radius:0 3px 3px 0;
+  }
+  .note p{margin:0 0 10px} .note p:last-child{margin:0}
+  .note b.tag{
+    font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--sealed); display:block; margin-bottom:6px; font-weight:600;
+  }
+
+  .scroll{overflow-x:auto; margin:14px 0 20px}
+  table{
+    border-collapse:collapse; width:100%; font-size:14px; background:var(--card);
+    font-variant-numeric:tabular-nums; min-width:560px;
+  }
+  th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--rule); vertical-align:top}
+  th{
+    font-family:var(--mono); font-size:10px; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--muted); font-weight:500;
+  }
+  td.k{font-weight:600}
+  td.num{font-family:var(--mono); font-size:13px; white-space:nowrap}
+
+  .chip{
+    font-family:var(--mono); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase;
+    padding:2px 7px; border-radius:2px; color:var(--chip-ink); font-weight:600; white-space:nowrap;
+  }
+  .chip.ok{background:var(--eval)}
+  .chip.off{background:var(--withheld)}
+  .chip.gone{background:var(--alarm)}
+
+  ol.steps{padding-left:0; list-style:none; margin:16px 0 15px; counter-reset:s}
+  ol.steps li{
+    counter-increment:s; position:relative; padding-left:38px; margin-bottom:16px; max-width:64ch;
+  }
+  ol.steps li::before{
+    content:counter(s); position:absolute; left:0; top:1px;
+    font-family:var(--mono); font-size:11px; font-weight:600; color:var(--signal);
+    border:1px solid var(--rule); background:var(--card);
+    width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:2px;
+  }
+
+  .asks{display:flex; flex-direction:column; gap:12px; margin:16px 0 0}
+  .ask{
+    background:var(--card); border:1px solid var(--rule); border-left:3px solid var(--signal);
+    border-radius:0 3px 3px 0; padding:14px 18px;
+  }
+  .ask p{margin:0; font-size:15px}
+  .ask b{display:block; font-size:15px; margin-bottom:3px}
+
+  hr{border:0; border-top:1px solid var(--rule); margin:46px 0 0}
+  .foot{font-size:14px; color:var(--muted); margin-top:22px}
+</style>
+
+<div class="wrap">
+
+  <p class="eyebrow">Nurse stress · status note</p>
+  <h1>Phase 0 Verification</h1>
+  <p class="lede">Three planning documents arrived. Before any of them runs, <code>PLAN.md</code>'s own first task — verify the facts table — has to pass. It partly doesn't.</p>
+
+  <div class="meta">
+    <span><b>28 Aug 2026</b></span>
+    <span>repo at <b>1f4ca0e</b></span>
+    <span>3 commits pulled</span>
+    <span>for <b>Elvis + Eric</b></span>
+  </div>
+
+  <div class="summary">
+    <p>Eric's three new commits are pulled. The exploration notebook now runs its diagnostics across 105 sessions rather than one, and carries executed outputs — which is what makes checking the plan against it possible at all.</p>
+    <p>Of the Phase 0 numbers I could check: <strong>two match, three are off, and the two that matter most aren't computed anywhere in the repo.</strong> None of this blocks the audit — <code>AUDIT.md</code> is self-contained and can start today. It does mean several Phase 3 design decisions currently rest on a number nobody can reproduce.</p>
+  </div>
+
+  <h2>What the three documents are</h2>
+  <p>They're a stack, not three parallel docs, and the dependency order is explicit:</p>
+  <ul>
+    <li><strong>judgment_calls_guide.html</strong> — the epistemology. Veridical data science / PCS: audit in order, because a weak link upstream caps the credibility of everything downstream. Ends in a 29-decision registry.</li>
+    <li><strong>AUDIT.md</strong> — the pre-flight check. Ten sections, A1 through A10, read-only against the archive, each with a stop condition.</li>
+    <li><strong>PLAN.md</strong> — the five-phase execution plan. States that it follows an earlier source plan which is authoritative.</li>
+  </ul>
+  <p><code>AUDIT.md</code> runs before <code>PLAN.md</code> Phase 1 freezes anything. That ordering is stated in the audit document itself and is worth respecting.</p>
+
+  <h2>Verification against the notebook</h2>
+  <p>Every number below is what <code>PLAN.md</code> asserts, checked against the executed output in Eric's notebook as committed.</p>
+
+  <div class="scroll">
+    <table>
+      <tr>
+        <th>Quantity</th><th>Plan states</th><th>Notebook computes</th><th>Status</th>
+      </tr>
+      <tr>
+        <td class="k">ICC(subject), temperature</td>
+        <td class="num">0.522</td><td class="num">0.522</td>
+        <td><span class="chip ok">match</span></td>
+      </tr>
+      <tr>
+        <td class="k">HRV, sessions with ≥1 usable run</td>
+        <td class="num">75/105, median 3</td><td class="num">75/105, median 3</td>
+        <td><span class="chip ok">match</span></td>
+      </tr>
+      <tr>
+        <td class="k">ICC(subject), EDA</td>
+        <td class="num">0.174</td><td class="num">0.132</td>
+        <td><span class="chip off">differs</span></td>
+      </tr>
+      <tr>
+        <td class="k">ICC(subject), HR</td>
+        <td class="num">0.106</td><td class="num">0.127</td>
+        <td><span class="chip off">differs</span></td>
+      </tr>
+      <tr>
+        <td class="k">EDA right-skewed (&gt;1)</td>
+        <td class="num">72/105</td><td class="num">70/105</td>
+        <td><span class="chip off">differs</span></td>
+      </tr>
+      <tr>
+        <td class="k">Labelling propensity AUC</td>
+        <td class="num">0.728</td><td class="num">not computed</td>
+        <td><span class="chip gone">absent</span></td>
+      </tr>
+      <tr>
+        <td class="k">P(labelled) per-subject range</td>
+        <td class="num">0.125–0.724 (5.8×)</td><td class="num">not computed</td>
+        <td><span class="chip gone">absent</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <p>The rest of the Phase 0 table — 609 sessions, 1,255 h, 358 survey rows, the 46/20/179 level split, the timezone resolution — is not disputed here. It simply hasn't been re-verified this pass, which is what <code>AUDIT.md</code> sections A1 through A4 exist to do.</p>
+
+  <h3>Why the ICC values drift</h3>
+  <p>The notebook's ICC cell samples <code>N_PER_SUBJECT = 3</code> sessions per subject. Those values <strong>will move between runs</strong> depending on which sessions get drawn — so the mismatch is probably not an error in either document, it's a statistic being quoted to three decimals when it doesn't have three decimals of stability. Either raise the sample and re-run, or quote them as approximate. Temperature at 0.522 is high enough that the conclusion drawn from it (absolute temperature works as a subject fingerprint) survives either way; the EDA and HR values are small enough that the exact figure carries less weight than the plan's prose implies.</p>
+
+  <div class="flag">
+    <b class="tag">The one that actually blocks something</b>
+    <p><strong>The SCAR result has no source in the repo.</strong> No propensity model, no AUC output, nothing that produces 0.728 or the 5.8× spread. It's marked "derived" in Phase 0, so it came from somewhere — most likely a separate session — but it isn't reproducible from anything committed.</p>
+    <p>This is the most load-bearing claim in the plan. It is the entire justification for subject-stratified nnPU (§3.3), for rejecting a pooled decision threshold (§3.0), and for figure F06. <code>AUDIT.md</code> section A7 is built to compute exactly this and expects exactly those values. Until it runs, several Phase 3 design decisions are resting on an unverified number — and if the real spread is narrower, some of them get simpler.</p>
+  </div>
+
+  <h2>Missing dependencies</h2>
+  <p>Three files referenced by <code>PLAN.md</code> don't exist anywhere in the repo:</p>
+  <ul>
+    <li><code>CLAUDE.md</code> — the plan opens with "Read CLAUDE.md first."</li>
+    <li><code>judgment_calls.yaml</code> — <code>JC02</code> through <code>JC28</code> are referenced throughout and currently resolve to nothing. The HTML guide's registry is the human-readable version of this file, so it is reconstructable, but that's real work and someone should own it.</li>
+    <li><code>nurse_stress_analysis_plan.md</code> — the "source plan" that <code>PLAN.md</code> describes as authoritative for its phases, exclusion order, and week sequencing.</li>
+  </ul>
+  <p><code>AUDIT.md</code> has none of these dependencies. It needs the archive path and the survey path and nothing else — another reason it goes first.</p>
+
+  <h2>What to run first</h2>
+  <ol class="steps">
+    <li><strong>A10 — the event-triggered average.</strong> Align every level-2 event at onset, average EDA and HR from 30 minutes before to 60 minutes after, pooled and then faceted by the six subjects with the most events. Both documents independently flag this as the cheapest possible kill-shot, and the audit says to run it <em>even if earlier sections are incomplete</em>. A flat trace means the labels don't mark a physiologically distinguishable state at this resolution — and no amount of PU learning, negative curation, or pretraining repairs that. A visible rise also hands us the empirical answer to the boundary-trimming question for free.</li>
+    <li><strong>A1 through A9, in order.</strong> Roughly ten scripts writing to <code>reports/audit/</code> and <code>figures/audit/</code>, read-only against the archive. A7 settles the SCAR question above; A5 settles whether HRV enters the baseline feature set or gets demoted to an ablation; A8 settles the negative ratio before it gets fixed rather than after.</li>
+  </ol>
+
+  <div class="note">
+    <b class="tag">A correction to how we'd been sequencing this</b>
+    <p>We had been treating self-supervised pretraining as an early move — use the large unlabelled pool to learn a representation, then fine-tune on the scarce labels. The plan's framing is sharper: <strong>the two problems are independent.</strong> Having no negative class (87.7% of sensor time unlabelled) and having too few positives (178 level-2 events across 14 usable subjects) are separate failures with separate fixes.</p>
+    <p>Negatives are Phases 2 and 3. Pretraining is Phase 4, and it is <em>optional</em> — gated on Phase 3 clearing a floor worth improving on. The line that settles the ordering: pretraining does not manufacture negatives, and a well-pretrained model fitted against a biased target is still biased.</p>
+  </div>
+
+  <h2>Open for Eric</h2>
+  <div class="asks">
+    <div class="ask">
+      <b>Where did the SCAR numbers come from?</b>
+      <p>If the propensity model exists somewhere, pushing it saves re-deriving it. If it doesn't, A7 produces it and we compare.</p>
+    </div>
+    <div class="ask">
+      <b>Do <code>CLAUDE.md</code> and the source plan exist on your side?</b>
+      <p>Neither is in the repo. If they're local to your machine, they should be committed before anyone executes against the plan.</p>
+    </div>
+    <div class="ask">
+      <b>Who reconstructs <code>judgment_calls.yaml</code>?</b>
+      <p>It's the preregistration — the plan says to freeze it with a git tag before Phase 3 fitting begins. Worth one of us owning it explicitly rather than both assuming the other has it.</p>
+    </div>
+  </div>
+
+  <hr>
+  <p class="foot">Verified against <code>Eric/nurse_stress_exploration.ipynb</code> at commit <code>1f4ca0e</code>. The three planning documents are currently outside the repo; moving them in would put them under version control alongside the work they describe.</p>
+
+</div>

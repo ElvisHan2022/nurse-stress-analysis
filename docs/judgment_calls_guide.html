@@ -1,0 +1,282 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Judgment calls in data processing for machine learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF1F3; --card:#FFFFFF; --ink:#17212B; --muted:#5B6B7A; --rule:#C3CBD2;
+    --signal:#2F6F9F; --withheld:#B8762A; --sealed:#6B5B95; --eval:#3F7D62; --alarm:#A8443C;
+    --display:'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --body:'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+    --mono:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--body);
+       font-size:16px; line-height:1.65; padding:44px 24px 90px}
+  .wrap{max-width:820px; margin:0 auto}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+           color:var(--muted); margin:0 0 6px}
+  h1{font-family:var(--display); font-weight:700; font-size:clamp(28px,4.4vw,40px); line-height:1.1;
+     letter-spacing:-.018em; margin:0 0 16px}
+  h2{font-family:var(--display); font-weight:700; font-size:23px; margin:58px 0 6px; letter-spacing:-.012em}
+  h2 .num{color:var(--signal); font-variant-numeric:tabular-nums; margin-right:.5em}
+  h3{font-family:var(--display); font-weight:700; font-size:16.5px; margin:30px 0 6px}
+  p{margin:0 0 16px}
+  .lede{color:var(--muted); font-size:17px; margin:0 0 10px}
+  .ask{background:var(--card); border-left:3px solid var(--signal); padding:14px 18px;
+       margin:18px 0; border-radius:0 3px 3px 0}
+  .ask p{margin:0; font-size:15px}
+  .ask b{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+         color:var(--signal); display:block; margin-bottom:5px; font-weight:600}
+  .sig{background:var(--card); border-left:3px solid var(--alarm); padding:14px 18px;
+       margin:18px 0; border-radius:0 3px 3px 0}
+  .sig p{margin:0 0 9px; font-size:15px} .sig p:last-child{margin:0}
+  .sig b{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+         color:var(--alarm); display:block; margin-bottom:5px; font-weight:600}
+  .eg{font-size:15px; color:var(--muted); border-left:2px solid var(--rule); padding-left:16px; margin:18px 0}
+  .eg b{color:var(--ink); font-weight:600}
+  pre{background:#1B2530; color:#DDE4EA; border-radius:3px; padding:14px 16px; overflow-x:auto;
+      font-family:var(--mono); font-size:12px; line-height:1.55; margin:0 0 16px}
+  code{font-family:var(--mono); font-size:.87em; background:#E2E7EB; padding:1px 5px; border-radius:2px}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit}
+  table{border-collapse:collapse; width:100%; font-size:14px; margin:12px 0 22px; background:var(--card)}
+  th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--rule); vertical-align:top}
+  th{font-family:var(--mono); font-size:10px; letter-spacing:.09em; text-transform:uppercase;
+     color:var(--muted); font-weight:500}
+  td.k{white-space:nowrap; font-weight:600}
+  .tier{font-family:var(--mono); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase;
+        padding:2px 7px; border-radius:2px; color:#fff}
+  .tier.core{background:var(--alarm)} .tier.sec{background:var(--withheld)} .tier.fix{background:var(--muted)}
+  hr{border:0;border-top:1px solid var(--rule); margin:48px 0}
+  ol.chk{padding-left:20px} ol.chk li{margin-bottom:9px; font-size:15px}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Reference · transferable</p>
+  <h1>Judgment calls in data processing for machine learning</h1>
+  <p class="lede">Every decision between a sensor and a model is a choice someone made. Most go unrecorded, and the ones that go unrecorded are the ones that move the answer. This is a list of where they hide, what to look at to find them, and what a bad answer looks like.</p>
+
+  <p>The organizing idea, which comes out of the veridical data science framing, is that a result is a claim resting on a chain: raw signal, then preprocessing, then features, then labels, then sampling unit, then model, then evaluation, then the conclusion. Weakness anywhere upstream caps the credibility of everything downstream, so you audit in order. A fancier model cannot repair a broken label.</p>
+
+  <p>What makes these <i>judgment calls</i> rather than errors is that a competent analyst could defensibly answer each one differently. That is exactly why they need recording. Yu and Barter's central empirical finding is worth holding onto: the uncertainty introduced by reasonable variation in cleaning choices is often comparable in magnitude to the uncertainty from resampling the data. Conventional confidence intervals capture only the second.</p>
+
+  <hr>
+
+  <h2><span class="num">01</span>Provenance</h2>
+  <p>Before anything else, ask how many transformations sit between the sensor and the table you were handed, and whether any of them were lossy and irreversible.</p>
+
+  <div class="ask"><b>What to look at</b>
+  <p>Count distinct values per column against what the instrument's resolution could physically produce. Compare the file you have against the original deposit's file list. Ask what the data looked like one step before it reached you.</p></div>
+
+  <div class="sig"><b>Signature of a problem</b>
+  <p>A continuous physiological channel with far fewer distinct values than rows. If heart rate shows a few thousand unique values across millions of rows, something forward-filled it onto a common grid, and the within-window variance you were about to compute is an artifact of the fill.</p>
+  <p>Channels that exist in the source deposit and not in your file. Their absence is a decision someone made for you.</p></div>
+
+  <div class="eg"><b>Worked example.</b> A merged convenience CSV of the nurse dataset forward-filled every channel onto one time grid. That single step dropped blood volume pulse and inter-beat intervals, which are the only sources of heart rate variability, and collapsed heart rate and electrodermal activity to a few unique values per window. The fix was returning to the original deposit and loading each channel at its own native rate.</div>
+
+  <hr>
+
+  <h2><span class="num">02</span>The unit of observation</h2>
+  <p>What is a row, and how many genuinely independent things does your dataset contain? These are usually three different numbers and people report the largest.</p>
+
+  <div class="ask"><b>What to look at</b>
+  <p>Write down three counts: rows, independent episodes, and independent people. Then compute the ratio between them.</p></div>
+
+  <div class="sig"><b>Signature of a problem</b>
+  <p>A rows-to-independent-units ratio above roughly a hundred. Every standard error you compute from the row count is then wrong by more than an order of magnitude, and any split that does not respect the independent unit leaks.</p>
+  <p>Overlapping windows. A 50 percent hop means adjacent rows share half their raw samples, so they are near-copies rather than observations.</p></div>
+
+  <div class="eg"><b>Worked example.</b> Roughly 4,869 windows, drawn from 178 events, drawn from 14 people. The honest denominator for a claim about generalizing to a new nurse is 14. The honest denominator for a claim about detecting an episode is 178. The window count is a compute statistic and belongs nowhere near a confidence interval.</div>
+
+  <hr>
+
+  <h2><span class="num">03</span>Time and alignment</h2>
+  <p>Whenever two sources are joined on time, ask whether both are on the same clock, at the same rate, with the same convention for what a timestamp marks.</p>
+
+  <div class="ask"><b>What to look at</b>
+  <p>Print the min and max timestamp of each source side by side. Then count how many joins actually succeed, and compare that against how many should. Read sampling rates from the file itself rather than from documentation.</p></div>
+
+  <div class="sig"><b>Signature of a problem</b>
+  <p>A join that returns suspiciously few rows and no error. This is the worst class of bug because nothing fails. A five-hour offset between a naive local timestamp and a UTC one will place nearly every annotated event outside its recording, and the pipeline will report zero positives rather than raising anything.</p>
+  <p>Documentation and device specification disagreeing on sampling rate. When they do, the file header is authoritative for your extraction and both documents are irrelevant.</p></div>
+
+  <div class="eg"><b>Worked example.</b> Survey timestamps in <code>America/Chicago</code>, sensor timestamps in UTC. The diagnostic is one line: count events whose start falls inside a recording session belonging to the same person. A low count is not a puzzle, it is the signature.</div>
+
+  <hr>
+
+  <h2><span class="num">04</span>Missingness</h2>
+  <p>Three separate questions, and people usually answer only the first. How much is missing. Where is it missing. And whether the pattern of missingness carries information about the outcome.</p>
+
+  <div class="ask"><b>What to look at</b>
+  <p>A missingness matrix, rows against columns, shaded by presence. Then missingness rate broken down by class. Then missingness rate broken down by any covariate you suspect drives it.</p>
+  <p>The decisive test: fit a model whose <i>only</i> features are missingness indicators, and see whether it predicts the label. If it does, missingness is a feature, and any model with access to it will use it.</p></div>
+
+  <div class="sig"><b>Signature of a problem</b>
+  <p>Missingness that clusters by person rather than scattering. That means the missing-data mechanism is confounded with the unit you split on.</p>
+  <p>Missingness correlated with the outcome through a physical mechanism. Sensor quality degrades under motion, motion tracks activity, activity tracks the condition you are trying to detect. Now your missingness indicator is a proxy for the label.</p>
+  <p>A caution people miss: gradient boosting libraries route missing values natively. A tree can split on missingness whether or not you supply an indicator column. Deciding not to impute does not close this door by itself.</p></div>
+
+  <p>The classical taxonomy is worth knowing but is less useful than the direct test above. Missing completely at random means the missingness is independent of everything. Missing at random means it depends on observed variables. Missing not at random means it depends on the unobserved value itself. Physiological sensor dropout is almost never the first, usually the second, and sometimes the third.</p>
+
+  <hr>
+
+  <h2><span class="num">05</span>Exclusions, and their order</h2>
+  <p>Every dropped row is a judgment call. The subtle part is that exclusion rules do not commute, so the order is a second judgment call hiding behind the first.</p>
+
+  <div class="ask"><b>What to look at</b>
+  <p>An attrition table. One row per rule, in application order, showing the quantity entering, the quantity removed, and the quantity surviving. Every downstream count should trace back to this table.</p>
+  <p>Then run it again with two rules swapped and see whether the final count changes.</p></div>
+
+  <div class="sig"><b>Signature of a problem</b>
+  <p>The final count depends on rule order. That means order is a judgment call and must be recorded and perturbed like any other.</p>
+  <p>An exclusion rule whose threshold was chosen after seeing how it affected results. This is the most common and least visible form of the garden of forking paths, because no model was fitted when the choice was made.</p></div>
+
+  <div class="eg"><b>Worked example.</b> Dropping non-wear seconds and then computing session length gives a different session count than computing session length and then dropping non-wear. Both are defensible. Only one is what you did, and the write-up should say which.</div>
+
+  <hr>
+
+  <h2><span class="num">06</span>Label construction</h2>
+  <p>Ask who produced the label, under what incentive, at what time resolution, and whether that resolution matches the unit you are predicting.</p>
+
+  <div class="ask"><b>What to look at</b>
+  <p>The distribution of label durations. The count of labels per person. And the single most informative plot available: the <b>event-triggered average</b>, where you align every annotated episode at its onset and average the raw signal across a window spanning before and after.</p></div>
+
+  <div class="sig"><b>Signature of a problem</b>
+  <p>A flat event-triggered average. If nothing measurable happens when the annotation says something happened, the label does not mark a physiologically distinguishable state at your resolution, and no modeling repairs that. Better to learn this in week two.</p>
+  <p>Label durations with an implausible tail. A reported episode lasting five hours is either a genuine sustained state or an annotation left open, and the two demand different handling.</p>
+  <p>Label counts varying several-fold between people. That means annotation propensity is a person-level variable, which matters enormously if you split on person.</p></div>
+
+  <p>The specific failure worth naming is treating an interval label as per-instant truth. A reported thirty-minute episode is not thirty minutes of continuous state. It may be an eight-minute core surrounded by calm. The principled response is multiple-instance learning, where the interval is a bag labeled "at least one window inside is positive" and the model learns which minutes drove it.</p>
+
+  <hr>
+
+  <h2><span class="num">07</span>The comparison group</h2>
+  <p>Sometimes the negative class is observed. Often it is constructed, and the construction is described in one sentence of methods and never varied.</p>
+
+  <div class="ask"><b>What to look at</b>
+  <p>Covariate balance between the positive class and the candidate comparison group, before and after whatever construction you apply. Overlaid densities on every variable a model could exploit, especially activity, time of day, and anything person-specific.</p>
+  <p>Also the achievable size of the comparison group <i>per unit</i>, not in aggregate. An aggregate ratio that looks comfortable can conceal units that cannot supply any comparison at all.</p></div>
+
+  <div class="sig"><b>Signature of a problem</b>
+  <p>Residual imbalance after construction. It means the pool had no mass in the region the positives occupy, so matching silently degraded into filtering.</p>
+  <p>An aggregate ratio quoted without the per-unit breakdown. Class balance that varies across units also varies your decision threshold across units, which compounds with anything else that already threatens threshold transfer.</p></div>
+
+  <p>The general rule: <b>match, do not filter</b>. Filtering the comparison group toward convenient values creates exactly the confound the comparison was meant to remove. If positives contain motion and you build negatives from resting periods, you have built a motion detector and it will score beautifully.</p>
+
+  <hr>
+
+  <h2><span class="num">08</span>Features, and leakage through them</h2>
+  <p>Two questions. Does this feature encode the unit you split on, and does computing it use information the model would not have at deployment.</p>
+
+  <div class="ask"><b>What to look at</b>
+  <p>The intraclass correlation of each feature with respect to the split unit. High values mean the feature is largely a fingerprint of the person rather than a measurement of the state.</p>
+  <p>Then a direct probe: train a classifier to predict the split unit from the feature vector. Whatever accuracy it reaches is the shortcut available to your real model.</p></div>
+
+  <div class="sig"><b>Signature of a problem</b>
+  <p>An intraclass correlation above roughly 0.5 for a feature you were planning to use raw. Absolute skin temperature is the standard offender in wearable work, because everyone runs at their own baseline.</p>
+  <p>Any normalization statistic computed over the full record. Using a person's whole week to define their baseline uses their future, and it is not reproducible at deployment where no future exists. Causal trailing windows are both leak-free and deployable.</p></div>
+
+  <hr>
+
+  <h2><span class="num">09</span>The split</h2>
+  <p>Ask what is shared between training and test at each candidate level of splitting, then split at the level where the answer is "nothing".</p>
+
+  <div class="ask"><b>What to look at</b>
+  <p>List the levels: sample, window, episode, session, day, person. For each, ask what two rows on opposite sides could share. Overlapping windows share raw samples. Two windows from one session share a sensor placement. Two sessions from one person share a physiology.</p></div>
+
+  <div class="sig"><b>Signature of a problem</b>
+  <p>Accuracy that seems too good for the sample size. A random window split on autocorrelated sensor data will produce near-perfect numbers that mean nothing.</p>
+  <p>A validation set that shares units with the training set. Thresholds and stopping points chosen there are fitted to those units rather than estimated for a new one.</p></div>
+
+  <hr>
+
+  <h2><span class="num">10</span>Balance, and the two ledgers</h2>
+  <p>Keep two things separate that people routinely merge. <b>Prevalence</b> is how rare the positive class is. <b>Separability</b> is how far apart the classes sit. They have different fixes and conflating them means you cannot attribute a gain to the right cause.</p>
+
+  <div class="ask"><b>What to look at</b>
+  <p>Report the majority-class baseline next to every accuracy-like number. Under heavy imbalance a model can post a respectable score while a constant predictor posts a better one.</p></div>
+
+  <div class="sig"><b>Signature of a problem</b>
+  <p>Synthetic oversampling applied to autocorrelated time series. Interpolating between two adjacent windows manufactures a near-copy of a real sample. Applied before the split it leaks outright, and applied after it inflates apparent separability without adding information.</p>
+  <p>A metric that is not estimable in your setting being reported anyway. If your negative class is constructed and possibly contaminated, precision is a statement about your construction rather than about the world, and reporting it as performance is a category error.</p></div>
+
+  <p>Features move separability. Resampling and threshold choice move prevalence. Genuinely new negatives move both. Label which lever you pulled.</p>
+
+  <hr>
+
+  <h2>The order to look in</h2>
+  <p>Roughly the order of the sections above, because each one can invalidate the ones after it.</p>
+  <ol class="chk">
+    <li>Confirm you have the least-processed version available.</li>
+    <li>Establish the three counts: rows, episodes, units.</li>
+    <li>Verify every clock and every sampling rate from the files themselves.</li>
+    <li>Build the missingness picture, including the informative-missingness test.</li>
+    <li>Write the attrition table, then test whether rule order matters.</li>
+    <li>Run the event-triggered average before building any features. It can end the project cheaply.</li>
+    <li>Check comparison-group balance per unit, not in aggregate.</li>
+    <li>Probe for unit fingerprints in the features.</li>
+    <li>Choose the split level and state what it protects against.</li>
+    <li>Record every decision above, with the alternative you rejected and why.</li>
+  </ol>
+
+  <p>Step ten is the one that converts a careful analysis into a defensible one. The registry below is what it looks like written down.</p>
+
+  <hr>
+
+  <h2>This project's registry, in readable form</h2>
+  <p>Twenty-nine decisions. <span class="tier core">core</span> means it gets perturbed in the full stability analysis. <span class="tier sec">secondary</span> means a reduced grid, one at a time. <span class="tier fix">fixed</span> means recorded for transparency with a stated reason for not varying it.</p>
+
+  <h3>Cleaning</h3>
+  <table>
+    <tr><th>Decision</th><th>Default</th><th>Alternatives</th><th>Why it matters</th><th></th></tr>
+    <tr><td class="k">Timezone</td><td>survey naive Chicago, sensors UTC</td><td>survey is UTC</td><td>Getting it wrong produces zero positives with no error raised</td><td><span class="tier fix">fixed</span></td></tr>
+    <tr><td class="k">Minimum session length</td><td>5 min</td><td>2, 10</td><td>A session shorter than the window yields nothing</td><td><span class="tier sec">secondary</span></td></tr>
+    <tr><td class="k">Non-wear rule</td><td>temp out of range or zero accelerometer variance</td><td>temp only, accelerometer only</td><td>Determines the denominator for every hour count</td><td><span class="tier sec">secondary</span></td></tr>
+    <tr><td class="k">Dead-sensor rule</td><td>median EDA &lt; 0.05 µS or floor &gt; 50%</td><td>range only, none</td><td>Drops whole sessions, so it interacts with rule order</td><td><span class="tier sec">secondary</span></td></tr>
+    <tr><td class="k">Duplicate survey rows</td><td>drop exact duplicates</td><td>keep all</td><td>Data-entry artifact rather than repeated observation</td><td><span class="tier fix">fixed</span></td></tr>
+    <tr><td class="k">Unrated events</td><td>exclude from both classes</td><td>treat as positive, treat as unlabeled</td><td>113 of 358 rows. Moves the positive count materially. Note they still drive the guard band under every alternative</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">Level encoding</td><td>level 2 positive, 0 and 1 excluded</td><td>all positive; 0 as negative; 0 and 1 unlabeled</td><td>Level-0 windows were actively flagged. Merging them with unreported time puts the cleanest hard negatives in the noisiest bucket. The "0 as negative" branch would make this ordinary semi-supervised learning</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">Overlapping events</td><td>merge to outer span</td><td>drop both, keep first</td><td>12 pairs. Decide once, document it</td><td><span class="tier sec">secondary</span></td></tr>
+    <tr><td class="k">Boundary trimming</td><td>0 min</td><td>2, 5, 10</td><td>The direct answer to a published objection that marked sections exceeded plausible event duration</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">Maximum event duration</td><td>none</td><td>60, 120 min</td><td>34 events exceed 60 min, max 323</td><td><span class="tier sec">secondary</span></td></tr>
+  </table>
+
+  <h3>Preprocessing</h3>
+  <table>
+    <tr><th>Decision</th><th>Default</th><th>Alternatives</th><th>Why it matters</th><th></th></tr>
+    <tr><td class="k">Window length</td><td>120 s</td><td>60, 180</td><td>Skin conductance responses lag onset by seconds and decay over tens of seconds. 60 s may not contain a full response</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">Hop</td><td>60 s</td><td>30, 120</td><td>Controls autocorrelation between rows. Evaluation uses non-overlapping windows regardless</td><td><span class="tier sec">secondary</span></td></tr>
+    <tr><td class="k">Normalization</td><td>causal trailing 60 min robust z, within session</td><td>session median, subject global, none</td><td>Median session is 1.17 h across 609 sessions, so no day-long calibration block exists. Global per-subject z uses the person's own future</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">Channel set</td><td>eda, hr, acc_mag, acc_sd, temp_delta</td><td>+ absolute temp; + HRV; EDA only; HR + HRV; accelerometer + hour</td><td>Absolute temperature has ICC 0.522 and works as a subject fingerprint. The last variant is the adversarial confound probe and must be run</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">HRV run admission</td><td>≥30 s and ≥20 beats</td><td>20 s/15 beats, 60 s/40 beats</td><td>Successive-difference metrics need genuinely successive beats</td><td><span class="tier sec">secondary</span></td></tr>
+    <tr><td class="k">Ectopic threshold</td><td>Malik 20%</td><td>15%, 25%</td><td>Standard criterion. Recorded, not varied</td><td><span class="tier fix">fixed</span></td></tr>
+    <tr><td class="k">Beat source</td><td>Empatica IBI file</td><td>re-detect from 64 Hz BVP</td><td>Empatica's rejection is conservative and externally defined. Re-detection raises coverage and invites accepting motion-corrupted beats</td><td><span class="tier sec">secondary</span></td></tr>
+  </table>
+
+  <h3>Negative construction</h3>
+  <table>
+    <tr><th>Decision</th><th>Default</th><th>Alternatives</th><th>Why it matters</th><th></th></tr>
+    <tr><td class="k">Same-day eligibility</td><td>on</td><td>off</td><td>Restricts candidates to days the nurse was demonstrably completing surveys, so absence of a report carries information. This is what reduces 1,255 h to 293 h</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">Guard band</td><td>30 min</td><td>15, 60</td><td>Interacts with long events. A long event plus a guard band consumes the day</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">Activity matching</td><td>decile within subject</td><td>none, global deciles, propensity</td><td>Filtering toward low motion creates the confound it removes. Matching globally makes subject identity a label proxy</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">Negative ratio</td><td>minimum achievable across subjects</td><td>3:1, per-subject, 1:1</td><td>Aggregate 3.6:1 conceals five subjects below 3:1 and one below 1:1. Varying balance varies the threshold, which compounds with the 5.8× labelling-propensity spread</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">Sampling seeds</td><td>3</td><td>more</td><td>The draw is stochastic and the pool is small</td><td><span class="tier core">core</span></td></tr>
+  </table>
+
+  <h3>Modeling</h3>
+  <table>
+    <tr><th>Decision</th><th>Default</th><th>Alternatives</th><th>Why it matters</th><th></th></tr>
+    <tr><td class="k">Algorithm</td><td>gradient boosting</td><td>logistic, CNN from scratch, pretrained CNN</td><td>The classical baseline may win outright at this sample size</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">Loss</td><td>nnPU</td><td>plain cross-entropy on naive negatives</td><td>nnPU is a loss, not a model. Boosting libraries make custom objectives awkward, so it attaches to logistic or a small network</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">Class prior π</td><td>0.10</td><td>0.05, 0.20, 0.30</td><td>Not identifiable from positive-unlabeled data. Anchored by the observed 8.0% coverage, with under-reporting implying the truth sits above it</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">Threshold source</td><td>inner validation subjects</td><td>per-subject calibration on first sessions</td><td>Reading it off the test subject makes recall selected rather than estimated. The labelling-propensity spread rules out a pooled threshold</td><td><span class="tier core">core</span></td></tr>
+    <tr><td class="k">Window weighting</td><td>equal per event</td><td>uniform per window</td><td>Effective sample size is 178 events. Under uniform weighting, subjects with long events dominate</td><td><span class="tier sec">secondary</span></td></tr>
+    <tr><td class="k">Masking</td><td>random 30 to 120 s spans across channels</td><td>shorter spans, per-channel</td><td>Fixed a priori. Choosing it by downstream performance leaks through the selection process even with per-fold pretraining</td><td><span class="tier fix">fixed</span></td></tr>
+    <tr><td class="k">Encoder freezing</td><td>frozen</td><td>last block, fully trainable</td><td>Freezing makes differences across negative-set conditions attributable to the head</td><td><span class="tier sec">secondary</span></td></tr>
+  </table>
+
+  <hr>
+  <p style="font-size:14.5px;color:var(--muted)">The machine-readable version of this table lives in <code>judgment_calls.yaml</code> and is what the pipeline actually reads. This page is the version you argue from. Freeze the YAML with a git tag before fitting anything in Phase 3; that tag is the preregistration.</p>
+</div>

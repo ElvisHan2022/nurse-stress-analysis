@@ -19,3 +19,6 @@ __pycache__/
 # Pixi environment
 .pixi/
 .DS_Store
+
+# Audit intermediates - regenerate with tasks/audit_a*.py
+Eric/cache/
