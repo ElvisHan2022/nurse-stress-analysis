@@ -2,7 +2,7 @@
 
 Reconciles two independent lines of work on the same archive:
 
-- **The audit** — `AUDIT.md` sections A1–A10 plus A5b, A5c and A11, run over all
+- **The audit** — `AUDIT.md` sections A1–A10 plus A5b, A5c, A5d and A11, over all
   609 sessions. Scripts in `tasks/audit_a*.py`, detail in `findings.md`, figures
   in `figures/audit/`.
 - **Plan v2** — `PLAN_v2.md`, whose Phase 0 facts come from Eric's exploration
@@ -12,7 +12,7 @@ Where they agree, the fact is settled. Where they disagree, the disagreement is
 resolved here with a number rather than left open. **This file supersedes the
 Phase 0 tables in both `PLAN.md` and `PLAN_v2.md`.**
 
-Last updated 2026-08-28 against `Eric/nurse_stress_exploration.ipynb` at `178f713`.
+Last updated 2026-08-29 against `Eric/nurse_stress_exploration.ipynb` at `96387c2`.
 
 ---
 
@@ -58,7 +58,55 @@ sufficient for RMSSD and SDNN (Muñoz 2015, near-perfect agreement against a
 
 ## 2. Where the two lines disagreed
 
-### 2.1 HRV — resolved against plan v2
+### 2.0 HRV — the units were never the same
+
+**`min_run` means beats in Eric's notebook and seconds in the audit.** His own
+comment states it: *"min_run=30 beats is LENIENT — conventional short-term HRV
+uses ~5 min (~300 beats)."* At the measured median valid interval of 0.75 s:
+
+| `min_run` (beats) | ≈ seconds | Audit equivalent |
+|---|---|---|
+| 30 | 22 s | `MIN_RUN_S = 22` |
+| 100 | 75 s | `MIN_RUN_S = 75` |
+| **120** | **90 s** | `MIN_RUN_S = 90` |
+| 300 | 225 s | `MIN_RUN_S = 225` |
+
+Commit `96387c2` is titled *"Updated nurse exploration with 120s run"*, but
+`min_run=120` is **~90 s, not 120 s**. Worth confirming which was intended.
+
+Reimplementing Eric's exact validity rule — intervals from `np.diff(t)`,
+`iv_range` (0.4, 1.5), Malik 0.20, plus his run-level HR and RMSSD plausibility
+gates — and applying the audit's denominator over all 609 sessions (A5d):
+
+| `min_run` | ≈ s | Subjects with a run in **best session** | Sessions ≥1 run | **120 s windows covered** | Subjects ≥100 windows |
+|---|---|---|---|---|---|
+| **30** | 22 s | 15/15 | 341/609 (56%) | **5.70%** | **7 of 15** |
+| 100 | 75 s | 14/15 | 110/609 (18%) | 1.27% | 0 of 15 |
+| **120** | **90 s** | 14/15 | 83/609 (14%) | **0.87%** | **0 of 15** |
+| 300 | 225 s | 4/15 | 8/609 (1%) | 0.14% | 0 of 15 |
+
+Two conclusions, and they point opposite ways:
+
+1. **At `min_run=30` beats, HRV is genuinely usable for about half the cohort** —
+   7 of 15 subjects clear 100 covered windows (DF 375, 83 339, BG 337, CE 253,
+   5C 250, E4 134, F5 133). This is a real concession to v2: HRV is not dead.
+2. **Commit `96387c2` tightens to `min_run=120` and that destroys it** — 0.87%
+   coverage, zero subjects clearing the threshold. Nothing in the ultra-short HRV
+   literature requires 90 s; Muñoz (2015) finds 120 s sufficient and even a single
+   10 s window valid for RMSSD, and Orini (2023) validates RMSSD from ≤15 s.
+
+**Recommendation: go looser, not tighter.** `min_run=30` beats, RMSSD only, as an
+ablation restricted to the seven subjects with real coverage. Report which
+subjects those are rather than carrying an availability flag across a cohort where
+half of it is structurally empty.
+
+**A tension this creates with §3.2.** DF and CE are two of the five best HRV
+subjects (375 and 253 covered windows) *and* two of the four flagged for flat EDA.
+Excluding them on EDA grounds removes the best HRV coverage in the cohort. The two
+exclusion criteria disagree about the same people, and that has to be decided
+explicitly rather than by whichever rule runs first.
+
+### 2.1 HRV at the audit's original thresholds — still resolved against v2
 
 v2 upgrades HRV from "probably unusable" to "viable for most subjects" and states
 that v1 was wrong. **The audit does not support the upgrade**, and the reason is a
@@ -247,10 +295,14 @@ cohort, applied uniformly.
 
 - **Phase 0** gains the event-triggered average as its first row. EDA responds at
   onset; HR does not.
-- **HRV leaves the baseline feature set** and becomes an ablation, at
-  `min_run=30`, RMSSD only, no frequency-domain measures.
+- **HRV leaves the baseline feature set** and becomes an ablation at
+  `min_run=30` **beats** (~22 s), RMSSD only, no frequency-domain measures, and
+  restricted to the seven subjects with real coverage. Do not tighten to
+  `min_run=120`: that is 0.87% coverage and zero usable subjects.
 - **Drop 6D plus DF, 7E, CE and EG** — ten subjects, 158 events. The four have
-  flat EDA and EDA is the only responsive channel.
+  flat EDA and EDA is the only responsive channel. **Unresolved:** DF and CE are
+  also two of the five best HRV subjects, so the EDA and HRV criteria disagree
+  about the same people. Decide explicitly rather than by rule order.
 - **`RATIO` = 2.14**, the minimum achievable on the ten-subject cohort, applied
   uniformly rather than letting balance vary seventeenfold across folds.
 - **1 Hz for the common grid**, native rates for rate-sensitive features, 120 s

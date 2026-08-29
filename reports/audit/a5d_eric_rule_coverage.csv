@@ -1,0 +1,5 @@
+min_run (beats),~seconds,subjects w/ run in BEST session,sessions w/ >=1 run,120s WINDOWS covered,windows n
+30,22s,15/15,341/609 (56%),5.70%,2123
+100,75s,14/15,110/609 (18%),1.27%,472
+120,90s,14/15,83/609 (14%),0.87%,323
+300,225s,4/15,8/609 (1%),0.14%,53
