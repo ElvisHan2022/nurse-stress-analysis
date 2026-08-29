@@ -111,6 +111,22 @@ def main():
             else:
                 avail += int((secs >= cover_frac * win_s).sum())
         return tot, avail, (cov_sum / tot if tot else 0.0)
+        
+    # --- capture every availability() call so the tables can be persisted -----
+    RECORDS = []
+    _availability = availability
+
+    def availability(win_s, min_run_s, min_beats, cover_frac):          # noqa: F811
+        tot, avail, mean_cov = _availability(win_s, min_run_s, min_beats, cover_frac)
+        RECORDS.append(dict(
+            window_s=win_s, min_run_s=min_run_s, min_beats=min_beats,
+            cover_frac=cover_frac, definition=("A_run_exists" if cover_frac <= 0
+                                               else f"B_covered_{cover_frac:.2f}"),
+            n_windows=tot, n_available=avail,
+            frac_available=(avail / tot if tot else np.nan),
+            mean_covered_s=mean_cov,
+        ))
+        return tot, avail, mean_cov
 
     # ---- 1. A5's definition, swept -----------------------------------------
     banner("Definition A - 'a usable run EXISTS in the window' (what A5 used)")
@@ -168,9 +184,7 @@ def main():
         for arr, _ in runs_by_session.values():
             if not len(arr):
                 continue
-            u = arr[(arr[:, 1] - arr[:, 0] >= min_run_s_of(lab)) &
-                    (arr[:, 2] >= min_beats)] if False else \
-                arr[(arr[:, 1] - arr[:, 0] >= min_run) & (arr[:, 2] >= min_beats)]
+            u = arr[(arr[:, 1] - arr[:, 0] >= min_run) & (arr[:, 2] >= min_beats)]
             secs += float((u[:, 1] - u[:, 0]).sum()) if len(u) else 0.0
         tot_usable[lab] = secs
         print(f"  {lab}:  {secs/3600:7.1f} h of usable beat data "
@@ -201,6 +215,20 @@ def main():
     plt.close(fig)
     print(f"\nwrote {os.path.join(FIG, 'A5b_hrv_sensitivity.png')}")
 
+    # --- persist ------------------------------------------------------------
+    A5B = (pd.DataFrame(RECORDS)
+             .drop_duplicates(subset=["window_s", "min_run_s", "min_beats", "cover_frac"])
+             .sort_values(["definition", "min_run_s", "window_s"]))
+    p = os.path.join(OUT, "a5b_availability.csv")
+    A5B.to_csv(p, index=False)
+    print(f"wrote {p}  ({len(A5B)} rows)")
+
+    U = pd.DataFrame([{"admission": k, "usable_hours": v / 3600,
+                       "pct_of_recorded": 100 * v / S.dur_s.sum()}
+                      for k, v in tot_usable.items()])
+    p = os.path.join(OUT, "a5b_usable_totals.csv")
+    U.to_csv(p, index=False)
+    print(f"wrote {p}")
 
 def min_run_s_of(lab):
     return int(lab.split()[-1].split("s")[0])
