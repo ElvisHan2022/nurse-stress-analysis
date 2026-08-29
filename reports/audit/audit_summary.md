@@ -1,270 +1,261 @@
-# Audit summary
+# Audit summary — merged source of truth
 
-Full run of `AUDIT.md` sections A1–A10 against the Dryad archive
-(`Eric/Stress_dataset`, 609 sessions, 3.55 GB) and `Eric/SurveyResults.xlsx`.
-Scripts in `tasks/audit_a*.py`, per-section detail in `findings.md`, figures in
-`figures/audit/`.
+Reconciles two independent lines of work on the same archive:
 
-Two additions beyond `AUDIT.md`: a **sample-rate feasibility analysis** (A1b) and
-a **person-day census** (A2b). One addition beyond the plan: **A10b**, a
-robustness re-run of the event-triggered average, which changed the headline.
+- **The audit** — `AUDIT.md` sections A1–A10 plus A5b, A5c and A11, run over all
+  609 sessions. Scripts in `tasks/audit_a*.py`, detail in `findings.md`, figures
+  in `figures/audit/`.
+- **Plan v2** — `PLAN_v2.md`, whose Phase 0 facts come from Eric's exploration
+  notebook and a 45-session stratified diagnostic sample.
+
+Where they agree, the fact is settled. Where they disagree, the disagreement is
+resolved here with a number rather than left open. **This file supersedes the
+Phase 0 tables in both `PLAN.md` and `PLAN_v2.md`.**
+
+Last updated 2026-08-28 against `Eric/nurse_stress_exploration.ipynb` at `178f713`.
 
 ---
 
-## 1. Expected against observed
+## 1. Settled facts
 
-| Quantity | Expected | Observed | Match |
+Confirmed independently by both lines of work. Carry these forward without
+re-deriving.
+
+| Fact | Value | Source |
+|---|---|---|
+| Subjects / sessions | 15 / 609 | both |
+| Sensor time | 1,251.7 h (v2 quotes 1,255) | both |
+| Median session length | 1.17 h | both |
+| Sessions under 5 min | 92 | both |
+| Person-days | **250** (8 for 6D to 26 for CE) | audit A2b |
+| Survey rows | 358 — 245 rated, 113 unrated | both |
+| Stress levels | 46 low / 20 medium / 179 high | both |
+| Subjects with zero medium events | 9 of 15 | both |
+| Exact duplicate survey rows | 3 | both |
+| Overlapping event pairs | 12 | both |
+| Longest event | 323 min | both |
+| **Level-2 events** | **178** | both |
+| Timezone | survey `America/Chicago` DST-aware, sensors UTC | both |
+| Native rates | ACC 32, BVP 64, EDA 4, HR 1, TEMP 4 Hz | both |
+| ICC(subject) at n=7 | temp 0.522, eda 0.132, acc 0.160, hr 0.127 | both, to 3 d.p. |
+| Drop subject 6D | 2 events, **0 eligible negatives** | both, independently |
+
+**Timezone evidence** (audit A4, 245 rated events): survey-as-UTC places 50
+(20.4%) inside a same-subject session; naive Chicago places **212 (86.5%)**. Best
+fixed offset is UTC−5 at 198; the DST-aware named zone beats it by 14 because the
+archive spans April to December. **Use the named zone, never a fixed offset.**
+33 rated events (13.5%) have no sensor coverage at all under the winning
+hypothesis; four of those sit within one minute of a session edge.
+
+**Window length is settled at 120 s / 60 s hop, twice over.** v2's argument is the
+stronger one: no labelled event is shorter than 120 s, and 300 s would discard 15
+events outright. Independently, the ultra-short HRV literature finds 120 s
+sufficient for RMSSD and SDNN (Muñoz 2015, near-perfect agreement against a
+240–300 s reference; Orini 2023 validates RMSSD from ≤15 s ECGs). The classical
+300 s figure is a Task Force recording convention, not a requirement here.
+
+---
+
+## 2. Where the two lines disagreed
+
+### 2.1 HRV — resolved against plan v2
+
+v2 upgrades HRV from "probably unusable" to "viable for most subjects" and states
+that v1 was wrong. **The audit does not support the upgrade**, and the reason is a
+denominator, not a bug.
+
+v2's evidence is session-level: *33/45 sessions have ≥1 plausible run*, and
+*min_run=100 → 11/15 subjects qualify **in their best session***. Both are
+maxima-flavoured statistics. The modelling substrate is the 120 s window.
+
+Measured over all 609 sessions (A5c):
+
+| min_run | Sessions with ≥1 usable run | **120 s windows covered** | Flattery ratio |
 |---|---|---|---|
-| Subjects | 15 | 15 | yes |
-| Session directories | 609 | 609 | yes |
-| Sensor hours | 1,255 | 1,251.7 | yes (0.3%) |
-| Median session length | 1.17 h | 1.167 h | yes |
-| Sessions < 5 min | 92 | 92 | yes |
-| `tags.csv` empty | 92% | 92.4% | yes |
-| Survey rows | 358 | 358 | yes |
-| Exact duplicate rows | 3 | 3 | yes |
-| Unrated events | 113 | 113 | yes |
-| Level 0 / 1 / 2 | 46 / 20 / 179 | 46 / 20 / 179 | yes |
-| Max event duration | 323 min | 323 min | yes |
-| Overlapping event pairs | 12 | 12 | yes |
-| Events > 60 min | 34 | **19 rated** (34 all events) | **no — see below** |
-| Level-2 events | 178 | 178 | yes |
-| Subjects below 3:1 negatives | 5 of 14 | 5 of 15 | yes |
-| ICC(subject), temperature | 0.522 | 0.522 (notebook) | yes |
-| Propensity AUC | 0.728 | **0.707 CV / 0.751 in-sample** | close |
-| P(labelled) spread | 5.8× | **5.36×** | close |
+| 30 s | 294/609 = 48.3% | **5.88%** | 8.2× |
+| 100 s (v2's primary) | 72/609 = 11.8% | **0.27%** | 44× |
+| 300 s | 5/609 = 0.8% | 0.00% | — |
 
-**The one real mismatch.** `AUDIT.md` A3 asks for the over-60-minute count on
-*rated* events and expects 34. Only **19 of 245 rated** events exceed 60 minutes;
-34 is the count across all 358 rows including unrated. This weakens the published
-event-duration objection: it applies to 7.8% of the rated set, not 9.5%.
+At v2's own `min_run=100`, **100 windows out of 37,252 carry HRV**. Per subject,
+the best is 5C with 35 covered windows, then BG with 33; **zero of fifteen
+subjects reach v2's own Phase 2 falsification threshold of ≥100 windows.**
 
-**On the SCAR numbers.** `PLAN.md` quoted these as "derived" with nothing in the
-repository computing them. A7 now does. The conclusion holds — SCAR is violated —
-but the exact figures are slightly softer, and an ablation shows **session
-duration (AUC 0.719) carries more of the propensity signal than subject identity
-(AUC 0.630)**. Part of what reads as subject-driven reporting bias is the
-mechanical fact that longer recordings contain more events. The subject component
-is real but smaller than 5.8× implies.
+Three things were checked to make sure this is not an artifact of the audit's
+method:
 
----
+1. **Ectopic handling is not the cause.** The audit splits a run at every Malik
+   violation, which is more conservative than the conventional drop-the-beat-and-
+   continue. Rerunning both ways: 5.94% vs 5.88%. Immaterial.
+2. **The time convention is correct.** `t[i] − t[i−1] == ibi[i]` within 50 ms for
+   88.3% of 812,794 consecutive pairs across 482 sessions. An off-by-one would
+   show near zero.
+3. **v2's per-subject run counts do not reproduce on the full archive.** They
+   correlate ρ=0.31 with the per-subject median but ρ=0.59 with the per-subject
+   **maximum** — the signature of a diagnostic sample stratified toward better
+   sessions.
 
-## 2. Stop conditions
+**Resolution: HRV is an ablation, not a baseline feature.** Restrict to RMSSD
+(which outperforms SDNN at short durations in every ultra-short study), drop
+frequency-domain measures entirely, and use `min_run=30` rather than 100 — still
+conservative against the literature and it is the difference between 5.9% and
+0.27% coverage. Total usable beat data in the archive is **39.5 h of 1,251.7 h
+(3.16%)** at 30 s/20 beats, or 57.3 h (4.58%) at a lenient 20 s/15 beats. Window
+choice only redistributes this; it cannot create more.
 
-| Section | Triggered | Resolution |
-|---|---|---|
-| A1 | **yes** | Spurious. See below. |
-| A2 | no | — |
-| A4 | no | — |
-| A10 | no | EDA responds at onset |
+v2's segmentation-bug fix may well be real. It does not change the conclusion.
 
-**A1's stop condition is mis-specified and should be amended.** It requires zero
-`t0` spread across signals within a session. Observed spread is **exactly 10.000 s
-in all 609 sessions, with zero variance, and entirely attributable to `HR.csv`** —
-the E4's documented algorithm warm-up. ACC, BVP, EDA and TEMP share an identical
-`t0` in every session. This is a device characteristic, not a broken extraction.
-Amend the rule to *"nonzero `t0` spread among ACC/BVP/EDA/TEMP, or an HR offset
-other than 10 s."*
+### 2.2 Smaller divergences
 
----
+| Quantity | Plan v2 | Audit | Reading |
+|---|---|---|---|
+| Propensity AUC | 0.728 | **0.707 CV**, 0.751 in-sample | v2's figure is in-sample; use the CV one |
+| P(labelled) spread | 5.8× | **5.36×** | conclusion unchanged |
+| Overlapping *session* pairs | 7 | **1** | unresolved, low stakes |
+| Eligible negative hours | 293.3 | **354.5** | different eligibility implementations |
+| Aggregate negative ratio | 3.6 : 1 | **4.83 : 1** | — |
+| Events over 60 min | 34 | **19 rated** | 34 is the all-events count; both `AUDIT.md` A3 and v2 §6.4 repeat this conflation |
+| Per-subject median EDA range | 26× | **15×** | v2 used the 45-session sample |
 
-## 3. The three sample sizes
-
-| Unit | Count | What it is the honest denominator for |
-|---|---|---|
-| 120 s windows | 37,252 | nothing — a compute statistic |
-| Level-2 events | **178** | "can we detect an episode" |
-| Subjects | **15** (14 usable) | "does this work on a new nurse" |
-
-Rows-to-subject ratio is **2,483**. The judgment-calls guide flags anything above
-~100 as a case where standard errors computed from the row count are wrong by more
-than an order of magnitude.
-
-Person-days: **250** with any sensor data, from 8 (subject 6D) to 26 (CE), median
-5.0 sensor-hours per person-day.
+**The SCAR refinement that matters.** An ablation on the propensity model shows
+session **duration** predicts labelling better (AUC 0.719) than subject identity
+(AUC 0.630). A meaningful share of the "5.8× SCAR violation" is the mechanical
+fact that longer recordings contain more events. Subject-stratified nnPU remains
+the right call; the justification should cite 0.63 for the subject component, not
+0.728 overall.
 
 ---
 
-## 4. Timezone
+## 3. Facts the audit added
 
-**Resolved: survey timestamps are naive `America/Chicago`, DST-aware.** Sensors
-are UTC unix epochs.
+### 3.1 The event-triggered average — the result that decides the project
 
-| Hypothesis | Rated events starting inside a same-subject session |
-|---|---|
-| Survey is UTC | 50 / 245 (20.4%) |
-| Survey naive Chicago → UTC | **212 / 245 (86.5%)** |
+Absent from both plan versions. **This is the check that asks whether the labels
+mark anything physiological at all**, and it should be Phase 0's first row.
 
-Best fixed offset is UTC−5 at 198; the DST-aware named zone beats it by 14 events,
-because the archive spans April to December. **Use the named zone, not an offset.**
-
-33 rated events (13.5%) fall outside every session even under the winning
-hypothesis — they have no sensor coverage at all. Four of those sit within one
-minute of a session boundary and could be recovered with a small tolerance; the
-rest are a median of 6.6 hours away and are genuinely uncovered.
-
-Written to `reports/audit/timezone_resolution.md`.
-
----
-
-## 5. Sample rates and analysis-rate feasibility
-
-Native rates, read from row 2 of each file: **ACC 32 Hz, BVP 64 Hz, EDA 4 Hz,
-HR 1 Hz, TEMP 4 Hz** — one distinct rate per signal across all 609 sessions.
-Published descriptions giving BVP 72 Hz and TEMP 10 Hz are wrong for this
-extraction.
-
-| Target | ACC | BVP | EDA | HR | TEMP | Channels backed by measurement |
-|---|---|---|---|---|---|---|
-| **1 Hz** | down | down | down | native | down | **5 of 5** |
-| **4 Hz** | down | down | native | ×4 up | native | 4 of 5 |
-| 8 Hz | down | down | ×2 up | ×8 up | ×2 up | 2 of 5 |
-| 16 Hz | down | down | ×4 up | ×16 up | ×4 up | 2 of 5 |
-| 32 Hz | native | down | ×8 up | ×32 up | ×8 up | 2 of 5 |
-
-**Recommendation: 1 Hz.** It is the only rate at which every channel is backed by
-real measurement. 4 Hz is defensible if HR is explicitly documented as
-step-interpolated. At 8 Hz and above, three of five channels are fabricated —
-within-window variance in EDA, HR and TEMP would be an artifact of the fill, which
-is precisely the flaw that made the merged Kaggle CSV unusable. Anything above
-4 Hz is only honest for an ACC/BVP-only model, and costs 8–32× the storage.
-
----
-
-## 6. HRV feasibility
-
-Time convention verified: `t[i] − t[i−1] == ibi[i]` within 50 ms for **88.3%** of
-812,794 consecutive pairs across 482 sessions. High enough to confirm the
-convention, so violations mean dropped beats rather than an indexing error.
-
-| Level | Coverage |
-|---|---|
-| Sessions with ≥1 usable run | 294 / 609 (48.3%) |
-| **120 s windows with a usable run** | **2,214 / 37,252 = 5.94%** |
-
-**Recommendation: HRV does not enter the baseline feature set.** Demote to an
-ablation. The session-level figure is eight times more flattering than the
-window-level one, exactly as `AUDIT.md` predicted. Per-subject availability ranges
-from 0.06% (EG) to 15.4% (BG).
-
-**A6's informative-missingness test does not fire.** A classifier using only
-missingness indicators and run length reaches **LOSO AUC 0.468** — below chance,
-median per-subject 0.50. HRV availability does fall with motion (10.7% in the
-lowest accelerometer decile to 3.6% in the highest), but it does not differ by
-class enough to act as a label proxy. One less confound than feared.
-
----
-
-## 7. Negative pool and the ratio setting
-
-Eligibility: session ≥ 30 min, on a subject-day carrying a reported event, ≥ 30 min
-from any event boundary rated or not.
-
-1,242 sensor hours → **354 hours of eligible negatives** (10,635 windows against
-2,203 positive).
-
-| | |
-|---|---|
-| Aggregate ratio | **4.83 : 1** |
-| Subjects below 3:1 | **5 of 15** — 6D, EG, 8B, 6B, CE |
-| Subjects below 1:1 | 1 — **6D, which has zero eligible negatives** |
-
-**Recommended setting: `RATIO = 1.87`** — the minimum achievable across subjects
-retaining any negatives — applied uniformly, after dropping 6D. Taking whatever
-each subject can supply, silently, would let class balance vary from 1.87:1 to
-32:1 across folds. Since balance moves the decision threshold and threshold
-transfer is already compromised by the A7 propensity spread, the two failures
-compound.
-
-This confirms `PLAN.md` amendment 2.1b in direction. The per-subject ratios differ
-from its table (it has CE at 0.9 and E4 at 2.3; observed here 2.45 and 3.73), but
-the qualitative claim — the aggregate conceals several subjects that cannot reach
-3:1 — holds, and the identity of four of the five is the same.
-
----
-
-## 8. Does anything happen at event onset?
-
-**Yes for EDA. No for HR.** This is the result that decides the project is well
-posed, and it required a robustness pass to state honestly.
-
-The pooled mean (A10) showed an EDA rise of **+9.75 causal-z units**, peaking at
-+25. That is not a plausible z-score. The causal-z denominator is a trailing IQR,
-so any stretch of near-constant EDA drives it toward zero and the ratio toward
-infinity. **Five events contribute 63% of the total shift**, the largest being
-+318. The mean is a statement about those five events, not the population.
-
-Outlier-resistant re-run (A10b), 140 level-2 events with usable coverage:
+140 level-2 events with usable coverage, aligned at onset, 0–10 min post-onset
+against the preceding 30 min:
 
 | Channel | Mean Δz | **Median Δz** | Events positive | Sign test | Median raw shift |
 |---|---|---|---|---|---|
-| **EDA** | +9.75 | **+0.568** | **90/140 = 64.3%** | **p = 0.0009** | **+0.64 µS** |
+| **EDA** | +9.75 | **+0.568** | **90/140 = 64.3%** | **p = 0.0009** | **+0.64 µS** on a 0.68 µS baseline |
 | HR | +0.006 | −0.067 | 68/140 = 48.6% | p = 0.80 | +0.47 bpm |
 
-EDA survives every robust test — sign test p = 0.0009, Wilcoxon p = 3.3×10⁻⁶ — and
-the raw median shift of +0.64 µS sits on a baseline of 0.68 µS, roughly a doubling
-of skin conductance. **HR shows nothing**: 48.6% of events move in the positive
-direction, indistinguishable from a coin flip.
+EDA survives every robust test (Wilcoxon p = 3.3×10⁻⁶) — roughly a doubling of
+skin conductance. **HR is a coin flip.** The problem is well posed, and it is well
+posed *in EDA*. Any result driven by heart rate deserves suspicion.
 
-The labels mark a physiologically distinguishable state, and they mark it in EDA.
-This is consistent with the original paper's SHAP finding that EDA dominates, and
-it is now established before any model was fitted.
+**Do not use the pooled mean.** It reports +9.75 because five events out of 140
+contribute 63% of the total, the largest at +318 causal-z units. The cause is a
+live bug — see §5.
+
+### 3.2 Near-floor EDA subjects — v2 was right, and it is now decisive
+
+The audit missed this; v2 caught it. Checking v2's four flagged subjects against
+the full archive rather than the 45-session sample confirms every one:
+
+| Subject | v2 median | Full archive | **IQR / median** |
+|---|---|---|---|
+| 7E | 0.09 µS | 0.074 | **0.60** |
+| DF | 0.07 µS | 0.092 | **0.44** |
+| EG | 0.10 µS | 0.099 | **0.72** |
+| CE | 0.10 µS | 0.106 | **0.48** |
+| *(all eleven others)* | — | 0.18 – 1.08 | **1.04 – 5.14** |
+
+The last column settles it. A low median alone is not disqualifying — a small but
+*varying* signal still carries information after causal normalisation. These four
+are the **only** subjects whose relative variation falls below 1.0, and there is
+no overlap with the rest of the cohort. Their EDA is not merely small, it is flat.
+
+Combined with §3.1 — EDA is the only channel that responds at onset — a subject
+with flat EDA cannot contribute signal. **Recommend dropping all four.**
+
+Phase 2 budget under each option (A11):
+
+| Option | Subjects | Level-2 windows | Neg. hours | Aggregate | Min achievable | Below 3:1 |
+|---|---|---|---|---|---|---|
+| Keep all 15 | 15 | 2,203 | 354.5 | 4.83:1 | 0.00 | 5 |
+| Drop 6D only | 14 | 2,181 | 354.5 | 4.88:1 | 1.87 | 4 |
+| **Drop 6D + all four** | **10** | **1,579** | **265.2** | **5.04:1** | **2.14** | **2** |
+| Drop 6D + DF, 7E | 12 | 1,927 | 290.8 | 4.53:1 | 1.87 | 4 |
+
+Dropping all four costs **exactly 20 of 178 events (11%)**, matching v2's estimate.
+It also *improves* the negative budget: minimum achievable ratio rises 1.87 → 2.14
+and subjects below 3:1 halve. **Recommended `RATIO` = 2.14** on the ten-subject
+cohort, applied uniformly.
+
+### 3.3 Other additions
+
+- **Sample-rate feasibility.** 1 Hz is the only common-grid rate at which all five
+  channels are real measurements. At 4 Hz, HR is upsampled ×4; at 8 Hz and above,
+  three of five channels are fabricated. This does not contradict v2's three-layer
+  model — v2 is right that rate-sensitive features must be extracted natively and
+  then aggregated — it constrains the *common grid* layer only.
+- **Missingness is not informative.** A classifier on missingness indicators alone
+  reaches LOSO AUC **0.468**, median per-subject 0.50. HRV availability falls with
+  motion (10.7% in the lowest accelerometer decile to 3.6% in the highest) but does
+  not act as a label proxy. One less confound than feared.
+- **Exclusion order does not commute.** Window-level filters do (36,535 surviving
+  either way). At session level, measuring length *before* removing non-wear keeps
+  517 sessions; *after* keeps 504. **Thirteen sessions change status on rule order
+  alone.** Declare the order and perturb it.
+- **The three sample sizes.** 37,252 windows / **178 events** / **15 subjects**
+  (10 after the recommended exclusions). 2,483 rows per person — any interval
+  computed from the row count is wrong by more than an order of magnitude.
 
 ---
 
-## 9. Rule order
+## 4. Problems in the source documents
 
-Window-level exclusions commute exactly — 36,535 surviving windows under both the
-`PLAN.md` order and the swapped order, difference zero.
-
-**Session-level exclusions do not.** Computing session length before removing
-non-wear keeps **517** sessions; removing non-wear first keeps **504**. Thirteen
-sessions change status. Both are defensible; only one is what you did, and the
-write-up must say which.
-
-Survey-side attrition: 358 rows → 355 (drop duplicates) → 242 (drop unrated) →
-178 (levels 0 and 1 excluded) → **176** (drop 6D).
-
----
-
-## 10. Judgment calls needing registry entries
-
-Encountered during the audit and not covered by the existing 29:
-
-1. **Analysis sample rate.** Not in the registry at all. Options 1 / 4 Hz, with
-   8+ Hz ruled out by A1b. Default 1 Hz. This is upstream of `JC14` (channel set)
-   and should precede it.
-2. **HR `t0` offset handling.** HR starts exactly 10 s after its siblings in every
-   session. Options: shift, truncate all channels to the common span, or carry the
-   offset into the resample index. Currently implicit.
-3. **Session-length rule position.** A9 shows this does not commute with non-wear
-   removal. Needs an explicit order declaration, and perturbing.
-4. **Event-coverage tolerance.** 33 rated events fall outside every session; 4 are
-   within one minute of a boundary. A tolerance parameter decides whether they are
-   recovered. Currently zero by omission rather than by choice.
-5. **Causal-z denominator floor.** The A10 artifact is a live failure mode. Any
-   feature built on `causal_z` needs a minimum-IQR floor or a clip, and the choice
-   changes results.
-6. **Robust vs mean aggregation for event statistics.** A10 and A10b give opposite
-   headlines from identical data. Fix this a priori.
-
-Item 5 is the one to act on first: it is not a reporting preference, it is a
-numerical failure that will propagate silently into every feature.
+1. **`AUDIT.md` A1's stop condition is mis-specified.** It requires zero `t0`
+   spread across signals. Observed spread is exactly 10.000 s in all 609 sessions
+   with zero variance, entirely the documented HR warm-up. ACC/BVP/EDA/TEMP share
+   an identical `t0` everywhere. Amend to exempt HR.
+2. **`AUDIT.md` A3 expects 34 events over 60 min from the rated set.** Rated-only
+   is 19; 34 counts unrated rows. This *weakens* the published event-duration
+   objection — 7.8% of rated events, not 9.5%.
+3. **v2 §6.4 threat 8 repeats the same 34.**
+4. **v2's Phase 0 propensity AUC of 0.728 appears to be in-sample.**
+5. **v2's signal-quality table is measured on 45 stratified sessions** and reads
+   optimistic against the full archive wherever the two can be compared.
 
 ---
 
-## What this changes for the plan
+## 5. Open items, in priority order
 
-- **HRV out of the baseline.** 5.94% window coverage. Ablation only.
-- **1 Hz confirmed as the analysis rate**, on measurement grounds rather than
-  convenience.
-- **Drop 6D** — it has zero eligible negatives, which A8 establishes independently
-  of its event count.
-- **`RATIO = 1.87`**, not 3.
-- **The project is well posed, on EDA.** HR contributes nothing at onset, which is
-  a reason to weight the feature set toward electrodermal channels and to treat any
-  HR-driven result with suspicion.
-- **SCAR is violated but less dramatically than stated**, and more of it is session
-  duration than subject identity. Subject-stratified nnPU is still the right call;
-  the justification should cite AUC 0.63 for the subject component, not 0.728
-  overall.
+1. **The causal-z denominator floor.** Not a preference — a numerical failure. The
+   trailing IQR approaches zero on flat stretches and produces z-scores above 300.
+   It already inverted the headline of §3.1 once. Every feature built on `causal_z`
+   inherits it. **Fix before any modelling.** Needs a minimum-IQR floor or a clip,
+   and the choice is itself a judgment call that needs recording.
+2. **Robust vs mean aggregation, fixed a priori.** §3.1 gives opposite headlines
+   from identical data depending on this. Commit to the median and sign test.
+3. **`judgment_calls.yaml` does not exist.** `PLAN.md` references `JC02`–`JC28`
+   throughout and the plan calls it the preregistration, to be git-tagged before
+   Phase 3. Six further calls surfaced during the audit that the 29-entry registry
+   does not cover: analysis sample rate; HR `t0` offset handling; session-length
+   rule position; event-coverage tolerance for the 33 uncovered events; the
+   causal-z floor; and robust-vs-mean aggregation.
+4. **`CLAUDE.md` and `nurse_stress_analysis_plan.md` do not exist in the repo**
+   despite `PLAN.md` referencing both as authoritative.
+5. **v2's open questions 1, 2, 4, 5, 7 remain open** — ICC on the log scale, the
+   `eda_med`/`eda_skew` coupling, E4's 1 °C temperature range, Malik truncation of
+   real RMSSD, and whether `tags.csv` corroborates the timezone conclusion.
+
+---
+
+## 6. What this changes for the plan
+
+- **Phase 0** gains the event-triggered average as its first row. EDA responds at
+  onset; HR does not.
+- **HRV leaves the baseline feature set** and becomes an ablation, at
+  `min_run=30`, RMSSD only, no frequency-domain measures.
+- **Drop 6D plus DF, 7E, CE and EG** — ten subjects, 158 events. The four have
+  flat EDA and EDA is the only responsive channel.
+- **`RATIO` = 2.14**, the minimum achievable on the ten-subject cohort, applied
+  uniformly rather than letting balance vary seventeenfold across folds.
+- **1 Hz for the common grid**, native rates for rate-sensitive features, 120 s
+  windows. All three now have evidence behind them rather than convention.
+- **Soften the SCAR justification** to the subject-specific component (0.63), not
+  the pooled 0.728.
+- **Weight the feature set toward EDA.** HR contributed nothing measurable at
+  onset.

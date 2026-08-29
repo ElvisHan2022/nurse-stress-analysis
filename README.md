@@ -22,3 +22,12 @@ Other docs:
 
 The reference repo (read-only, not vendored here — clone it separately) lives in `reference/`.
 Original work lives in `my_work/`.
+
+---
+
+## Source of truth
+
+`reports/audit/audit_summary.md` reconciles the full-archive audit
+(`tasks/audit_a*.py`) against the plan documents and supersedes the Phase 0
+fact tables in both `PLAN.md` and `PLAN_v2.md`. Start there before trusting a
+number quoted anywhere else in this repo.
