@@ -241,3 +241,25 @@
 
 **Surprises.** 13 sessions change status depending on whether non-wear is removed before or after the length cutoff
 
+
+### A11 · Near-floor EDA subjects
+
+**Ran:** `tasks/audit_a11.py` at 2026-08-28 18:17
+
+**Numbers**
+
+| Quantity | Observed | Expected | Match |
+|---|---|---|---|
+| median EDA, DF | 0.092 uS | 0.07 (v2) | yes |
+| median EDA, 7E | 0.074 uS | 0.09 (v2) | yes |
+| median EDA, CE | 0.106 uS | 0.10 (v2) | yes |
+| median EDA, EG | 0.099 uS | 0.10 (v2) | yes |
+| per-subject median EDA range | 0.074-1.078 uS | 26x (v2) | 15x here |
+| events lost if all four dropped | 20 | 20 (v2) | yes |
+
+**Figures:** `figures/audit/A11_eda_floor_by_subject.png`
+
+**What this changes.** Closes the gap between the A1-A10 audit and plan v2 section 1.5. Feeds the Phase 1 rule-9 decision and the Phase 2 budget.
+
+**Surprises.** the audit never checked EDA signal quality per subject; v2 caught it
+

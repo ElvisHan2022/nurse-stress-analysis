@@ -1,0 +1,7 @@
+min_run_s,ectopic handling,sessions >=1 run,120s windows covered
+30,SPLIT (A5),294/609 (48%),5.94%
+30,"drop beat, continue",294/609 (48%),5.88%
+100,SPLIT (A5),72/609 (12%),0.27%
+100,"drop beat, continue",72/609 (12%),0.27%
+300,SPLIT (A5),5/609 (1%),0.00%
+300,"drop beat, continue",5/609 (1%),0.00%

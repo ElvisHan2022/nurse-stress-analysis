@@ -1,0 +1,5 @@
+option,subjects,level2 windows,eligible neg windows,neg hours,aggregate ratio,min achievable,subjects < 3:1
+keep all 15,15,2203,10635,354.5,4.83,0.0,5
+drop 6D only (v2 rule 8),14,2181,10635,354.5,4.88,1.87,4
+drop 6D + all four at-risk,10,1579,7955,265.2,5.04,2.14,2
+"drop 6D + DF, 7E only",12,1927,8725,290.8,4.53,1.87,4
