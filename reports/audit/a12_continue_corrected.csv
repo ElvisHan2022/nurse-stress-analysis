@@ -1,0 +1,5 @@
+min_run_s,variant,sessions >=1 run,120s windows,n
+30,SPLIT at every violation (A5),294/609,5.94%,2214
+30,TRUE continue (corrected),302/609,6.83%,2545
+100,SPLIT at every violation (A5),72/609,0.27%,102
+100,TRUE continue (corrected),85/609,0.38%,142

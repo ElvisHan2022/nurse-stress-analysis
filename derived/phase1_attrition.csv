@@ -1,0 +1,6 @@
+#,rule,entering,removed,surviving
+1,sessions < 5 min (measured BEFORE non-wear),37252,32,37220
+2,non-wear windows,37220,87,37133
+3,dead-EDA sessions,37133,598,36535
+8,subject 6D (0 eligible negatives),36535,681,35854
+9,"flat-EDA subjects 7E, DF, EG, CE",35854,11520,24334

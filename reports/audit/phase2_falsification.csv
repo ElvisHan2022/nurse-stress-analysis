@@ -1,0 +1,6 @@
+feature set,n_features,LOSO AUC
+ACC-only,2,0.5167
+Time-of-day-only,1,0.5128
+Time + session position,2,0.5016
+EDA-only,2,0.7706
+Full (minimal),6,0.7426

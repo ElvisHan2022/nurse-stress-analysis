@@ -186,3 +186,32 @@ def style_axes(ax, title=None, xlabel=None, ylabel=None):
         ax.set_ylabel(ylabel, fontsize=9)
     ax.grid(alpha=.3, linewidth=.6)
     ax.tick_params(labelsize=8)
+
+
+# ---------------------------------------------------- normalisation ----
+
+# Floor for the trailing-IQR denominator, measured in A12 as the 1st percentile
+# of the observed trailing 60-min IQR of EDA (0.0048 uS across 1.33M values).
+# Without it a flat stretch drives IQR toward zero and z toward infinity: the
+# raw max was 1,600 and 2.31% of values exceeded |z| = 10.
+CAUSAL_Z_IQR_FLOOR = 0.0048
+CAUSAL_Z_CLIP = 10.0
+
+
+def causal_z_safe(s, window="60min", min_periods=600,
+                  iqr_floor=CAUSAL_Z_IQR_FLOOR, clip=CAUSAL_Z_CLIP):
+    """Trailing robust z that cannot explode.
+
+    Two guards, both judgment calls recorded in judgment_calls.yaml:
+      1. the IQR denominator is floored, so a flat window cannot divide by ~0
+      2. the output is clipped, because a small-but-not-tiny IQR plus a large
+         jump still yields |z| ~ 40
+
+    Uses only the past, so it is leakage-free and reproducible at deployment.
+    """
+    med = s.rolling(window, min_periods=min_periods).median()
+    q75 = s.rolling(window, min_periods=min_periods).quantile(.75)
+    q25 = s.rolling(window, min_periods=min_periods).quantile(.25)
+    iqr = (q75 - q25).clip(lower=iqr_floor)
+    z = (s - med) / iqr
+    return z.clip(-clip, clip) if clip else z
