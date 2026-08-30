@@ -19,8 +19,8 @@
 \usepackage{graphicx}
 \usepackage{xcolor}   % \answerYes/No/NA use \textcolor
 
-\title{We Couldn't Pretrain Our Way Out of a Missing Negative Class:\\
-Nurse Stress Detection from Wearables}
+\title{Pretraining and Self-Supervised Learning for Detecting
+Nurse Stress from Wearables}
 
 \author{%
   Anonymous Author(s) \\
@@ -34,28 +34,29 @@ Nurse Stress Detection from Wearables}
 \maketitle
 
 \begin{abstract}
-Nine percent of this dataset is labelled, which is the condition
-self-supervised learning exists for, and pretraining on the unlabelled
-remainder was the experiment we set out to run. A pretext task cannot be
-evaluated without a supervised baseline to beat, and this dataset supplies
-neither a baseline nor the negative class one would need, because no nurse ever
-recorded being unstressed. All 358 survey entries mark an episode a nurse
-flagged, and the number attached is its severity, not its presence. This paper
-reports the attrition required to construct both. We start from 609 recordings
-and 15 participants and arrive at 138 episodes from 10, testing at each step
-whether what survived is real rather than manufactured. The labels do mark a
-physiological state, but in one channel only: skin conductance rises at
-reported onset in 64.3\% of episodes ($p=0.0009$), while heart rate rises in
-48.6\%, which is what a coin flip produces ($p=0.80$). The constructed
-comparison group survives falsification, detecting neither movement nor shift
-schedule (both AUC $0.51$), and the baseline built on it clears a
-within-participant permutation null ($0.765$ against $0.497\pm0.010$) while
-recovering only 10.6\% of episodes at one false alarm per worn hour.
-Pretraining over 1,238 unlabelled hours then matches random initialisation at
-every label count from 25 to 138 episodes, and both trail the hand-crafted
-baseline by $0.11$ AUC. Severity prediction, the one task here needing no
-constructed negatives, is also at chance. On this dataset the constraint is the
-label supply, and pretraining as we implemented it does not substitute for it.
+Wearable sensors promise a continuous alternative to questionnaires for
+measuring occupational stress, and self-supervised pretraining is the standard
+response when those recordings are mostly unlabelled. We set out to
+apply it to a public dataset of fifteen hospital nurses, each recorded for a
+week during the COVID-19 pandemic, who reported stressful episodes on a
+smartphone as they occurred. Ninety-one percent of the recorded sensor time
+carries no label. Pretraining cannot be evaluated without a supervised baseline
+worth improving on, and building one requires examples of unstressed time that
+this protocol never collected, since all 358 survey entries mark an episode a
+nurse chose to flag and the number attached is its severity rather than its
+presence. This paper reports the attrition required to construct both, from 609
+recordings and fifteen participants down to 138 episodes from ten, testing at
+each step whether what survived is real rather than manufactured.
+Skin conductance rises at reported onset in 64.3\% of episodes ($p=0.0009$),
+while heart rate is indistinguishable from chance ($p=0.80$). A comparison group built by activity-matched sampling detects
+neither movement nor shift schedule (both AUC $0.51$), and a baseline trained on
+it reaches AUC $0.765$ against a within-participant permutation null of
+$0.497\pm0.010$, recovering 10.6\% of episodes at one false alarm per worn
+hour. Pretraining over 1,238 unlabelled hours then matches random
+initialisation at every label count from 25 to 138 episodes, and both trail the
+hand-crafted baseline by $0.11$ AUC. Severity prediction, which needs no
+constructed negatives, is also at chance. What limits this dataset is the
+supply of labels, and pretraining at this scale does not substitute for it.
 \end{abstract}
 
 \section{Introduction}
@@ -565,7 +566,7 @@ participant, these are upper bounds, so the honest comparison is less
 favourable still.
 
 \paragraph{Severity, where no negatives are constructed.} Detection could in
-principle be blamed on our constructed comparison group. Severity cannot: it
+principle be blamed on our constructed comparison group. Severity cannot be, since it
 runs on 186 episodes rather than the 138 used for detection, because the
 detection task additionally requires each episode to survive the negative
 construction and the high-severity filter, while severity keeps the low- and
@@ -591,39 +592,39 @@ labels do not improve on the baseline and two make it worse. A learned
 representation over 1{,}238 unlabelled hours does not improve on it either. And
 severity, which needs no constructed negatives at all, is at chance.
 
-What remains is the data. There are 138 episodes from 10 participants. The
-labels are retrospective self-reports of intervals, treated here as uniform
-states although a thirty-minute report is unlikely to describe thirty uniform
-minutes. The negative class is constructed rather than observed. One of four
-channels responds at onset.
+What remains is the data. There are 138 episodes from ten participants, the
+labels are retrospective reports of intervals treated here as uniform states,
+the negative class is constructed rather than observed, and one channel of
+four responds at onset.
 
 This bears on the published $F_1$ of $0.99$ \cite{mathur2024}. We are not
 able to diagnose another group's protocol from a published summary, so we
 note the discrepancy without attributing a cause and report our own
 protocol in full so the comparison can be made.
 
-The consequence is about collection rather than modelling, and one change
-matters more than the rest: record explicit non-stress intervals. Their
-absence is what makes every number here conditional on a construction we
-chose, and no volume of unlabelled recording substitutes for it.
+The consequence falls on collection rather than modelling, and one change
+would matter more than the rest. A study of this kind should record explicit
+non-stress intervals, since their absence is what leaves every number here
+conditional on a construction we chose, and no volume of unlabelled
+recording will substitute for it.
 
 \section{Limitations}
 
 The cohort is 10 of 15 female nurses at a single hospital during a pandemic,
-so external validity is narrow. Negatives are constructed, so precision is not a
-performance claim: a flagged unlabelled window may be a false alarm or an
-unreported episode. The class prior is
+so external validity is narrow. Negatives are constructed, so precision is not
+offered as a performance claim, since a window the model flags may be a
+false alarm or an episode that went unreported. The class prior is
 not identifiable and is bracketed rather than estimated. Our positive-unlabelled arm uses a
 fixed budget with no inner validation split, so its null is weaker evidence
 than the naive comparator, which differs from the baseline only in label
 treatment.
-We searched two learners and one hand-crafted feature set. Thirty-three rated
-episodes have no sensor coverage and are absent from every metric. Two
-normalisation constants, the denominator floor and the output clip, are choices
-we record and vary rather than defend. Ten folds is underpowered for the paired
+We searched two learners and one hand-crafted feature set, and thirty-three
+rated episodes have no sensor coverage and are absent from every metric. Two
+normalisation constants, the denominator floor and the output clip, are
+recorded and varied rather than defended. Ten folds is underpowered for the paired
 comparisons, so we state spreads descriptively rather than dividing by the root
-of the fold count. The permutation null uses twenty draws,
-so its $p$-value floor is $0.048$.
+of the fold count, and the permutation null's twenty draws put its $p$-value
+floor at $0.048$.
 
 The pretraining result carries its own qualifications. The encoder saw every
 participant, so Table \ref{tab:ssl} reports transductive upper bounds rather
@@ -637,14 +638,12 @@ collapsed task rather than a three-class model.
 
 \section{Conclusion}
 
-We never reached the experiment we set out to run: establishing its
-prerequisites consumed the study, and the prerequisites turned out to be
-the result. That result is not local to this dataset. Ambulatory affect sensing is
-collected almost everywhere by asking participants to flag episodes, and a
-protocol that records only episodes cannot yield a negative class.
-Self-supervision is the standard answer to label scarcity in exactly that
-setting, and it does not answer this version of it: unlabelled hours add
-signal, not the annotation that makes signal interpretable.
+The experiment we set out to run was never within reach. Establishing its
+prerequisites consumed the study, and the prerequisites were the finding. A
+protocol that records only the episodes a participant chooses to flag cannot
+describe the time between them, and that is how ambulatory affect sensing is
+almost always collected. This dataset does not lack hours of physiology. It
+lacks the annotation that would make them interpretable.
 
 \begin{thebibliography}{20}
 
