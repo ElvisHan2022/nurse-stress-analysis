@@ -1,0 +1,4 @@
+link,n,positives,AUC
+"P(severity >= 1), low vs rest",186,155,0.4964
+"P(severity >= 2), high vs rest",186,141,0.5417
+collapsed high vs rest,186,141,0.5417

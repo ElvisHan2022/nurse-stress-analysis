@@ -25,3 +25,6 @@ Eric/cache/
 
 # stray LaTeX output at repo root
 texput.log
+derived/pretrain_corpus.npz
+derived/phase5_windows.npz
+paper/_tmpl/*.log
