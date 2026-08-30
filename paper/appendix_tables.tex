@@ -1,0 +1,106 @@
+\section{Per-participant cohort and negative construction}
+\label{app:cohort}
+
+Counts after the Phase 1 exclusions, for negative-sampling seed 0. The
+target ratio is 2.14, the maximum achievable uniformly across the cohort;
+two participants fall short because their eligible negative pool is
+exhausted before the target is met.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrr}
+\toprule
+Participant & Positive windows & Negative windows & Ratio \\
+\midrule
+15 & 79 & 168 & 2.13 \\
+5C & 68 & 117 & 1.72 \\
+6B & 182 & 341 & 1.87 \\
+7A & 248 & 526 & 2.12 \\
+83 & 314 & 672 & 2.14 \\
+8B$^{\dagger}$ & 74 & 97 & 1.31 \\
+94$^{\dagger}$ & 34 & 73 & 2.15 \\
+BG & 154 & 331 & 2.15 \\
+E4 & 310 & 663 & 2.14 \\
+F5 & 116 & 248 & 2.14 \\
+\midrule
+Total & 1579 & 3236 & 2.05 \\
+\bottomrule
+\end{tabular}
+\caption{Cohort and negative construction. $\dagger$ marks the two participants whose achieved ratio falls below the 2.14 target.}
+\end{table}
+
+\section{Exclusion cascade}
+\label{app:attrition}
+
+Window counts through the exclusion rules, in the order fixed in advance.
+Rule numbering follows the analysis plan; rules that remove no windows at
+the window level are omitted.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{cp{5.8cm}rrr}
+\toprule
+\# & Rule & Entering & Removed & Surviving \\
+\midrule
+1 & sessions $<$ 5 min, before non-wear removal & 37252 & 32 & 37220 \\
+2 & non-wear windows & 37220 & 87 & 37133 \\
+3 & dead-EDA sessions & 37133 & 598 & 36535 \\
+8 & participant 6D, no eligible negatives & 36535 & 681 & 35854 \\
+9 & flat-EDA participants (four) & 35854 & 11520 & 24334 \\
+\bottomrule
+\end{tabular}
+\caption{Exclusion cascade at the window level.}
+\end{table}
+
+\section{Per-fold results}
+\label{app:perfold}
+
+Leave-one-participant-out folds, averaged over three negative-sampling
+seeds, with the across-seed range. Episode recall is at one false alarm
+per worn hour. These are the folds behind the aggregate figures in
+Section 5; we report them individually because the spread is wide and the
+two lowest-count folds are not comparable to the rest.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrcr}
+\toprule
+Participant & Episodes & AUC & AUC range & Episode recall \\
+\midrule
+5C & 4 & 0.388 & 0.365--0.401 & 0.000 \\
+BG & 13 & 0.633 & 0.622--0.646 & 0.000 \\
+6B & 10 & 0.682 & 0.671--0.701 & 0.200 \\
+15 & 10 & 0.811 & 0.794--0.828 & 0.067 \\
+E4 & 23 & 0.813 & 0.804--0.825 & 0.232 \\
+94 & 5 & 0.835 & 0.816--0.865 & 0.133 \\
+83 & 15 & 0.841 & 0.828--0.861 & 0.089 \\
+7A & 23 & 0.847 & 0.827--0.867 & 0.029 \\
+F5 & 23 & 0.882 & 0.867--0.898 & 0.159 \\
+8B & 12 & 0.885 & 0.858--0.909 & 0.028 \\
+\midrule
+Mean & 138 & 0.762 & & 0.094 \\
+\bottomrule
+\end{tabular}
+\caption{Per-fold AUC and episode recall, seed-averaged. The fold range quoted in the main text, 0.388 to 0.885, is the range of this column.}
+\end{table}
+
+\section{Operating points}
+\label{app:operating}
+
+The alarm-rate trade-off, averaged over three seeds. The paper reports the
+one-alarm-per-worn-hour row; the others are given so the shape of the
+curve is visible rather than asserted.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{rrrrc}
+\toprule
+False alarms/h & FPR & Window recall & Episode recall & Range \\
+\midrule
+0.5 & 0.0176 & 0.087 & 0.029 & 0.029--0.029 \\
+1.0 & 0.0357 & 0.155 & 0.106 & 0.058--0.130 \\
+2.0 & 0.0715 & 0.292 & 0.280 & 0.261--0.319 \\
+\bottomrule
+\end{tabular}
+\caption{Operating points over 138 episodes with usable coverage.}
+\end{table}
