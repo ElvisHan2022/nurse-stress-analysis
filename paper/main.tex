@@ -34,9 +34,12 @@ Nurse Stress from Wearables}
 \maketitle
 
 \begin{abstract}
-Wearable sensors record continuously, so a week on a nurse's wrist produces far
-more physiology than anyone will label, and self-supervised pretraining is the
-standard way to use the remainder. We study a public dataset of fifteen
+Wearable sensors record continuously, but labels arrive only when a participant
+stops to report something, so field deployments routinely carry orders of
+magnitude more unlabelled than labelled time, and the labels that do exist
+mark events rather than their absence. Self-supervised pretraining is the
+standard response to the first of those problems and no response at all to
+the second. We study a public dataset of fifteen
 hospital nurses monitored during the COVID-19 pandemic, 1{,}251.7 hours of
 recording against 358 self-reported episodes, leaving 91\% of the time
 unlabelled and no record anywhere of a nurse being unstressed. In this paper we
@@ -55,8 +58,7 @@ from collection protocols that record calm periods rather than from larger
 models or more unlabelled data. Along the way we establish that the labels mark
 a physiological state in one channel only, skin conductance rising at reported
 onset in 64.3\% of episodes ($p=0.0009$) where heart rate does not
-($p=0.80$), that the comparison group detects neither movement nor shift
-schedule, and that the baseline reaches AUC $0.765$ against a
+($p=0.80$), and that the baseline reaches AUC $0.765$ against a
 within-participant permutation null of $0.497$ while recovering 10.6\% of
 episodes at one false alarm per worn hour. Severity prediction, which needs no
 constructed negatives, is at chance as well.
