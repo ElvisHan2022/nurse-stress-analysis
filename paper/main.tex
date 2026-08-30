@@ -17,6 +17,7 @@
 \usepackage{nicefrac}
 \usepackage{microtype}
 \usepackage{graphicx}
+\usepackage{xcolor}   % \answerYes/No/NA use \textcolor
 
 \title{You Can't Pretrain Your Way Out of a Missing Negative Class:\\
 Nurse Stress Detection from Wearables}
@@ -232,7 +233,7 @@ coverage. Robust statistics only; see the note below on why.}
 Channel & Median $\Delta z$ & Episodes positive & Sign test & Median raw shift \\
 \midrule
 Electrodermal activity & $+0.568$ & 90/140 (64.3\%) & $p = 0.0009$ &
-  $+0.64\,\si{\micro\siemens}$ \\
+  $+0.64\,\mu\mathrm{S}$ \\
 Heart rate & $-0.067$ & 68/140 (48.6\%) & $p = 0.80$ & $+0.47$ bpm \\
 \bottomrule
 \end{tabular}
@@ -679,7 +680,7 @@ M.~Orini et~al.
 \end{thebibliography}
 
 
-ewpage
+\newpage
 
 \appendix
 
