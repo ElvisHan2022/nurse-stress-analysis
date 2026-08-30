@@ -283,8 +283,8 @@ cohort, applied uniformly.
    does not cover: analysis sample rate; HR `t0` offset handling; session-length
    rule position; event-coverage tolerance for the 33 uncovered events; the
    causal-z floor; and robust-vs-mean aggregation.
-4. **`CLAUDE.md` and `nurse_stress_analysis_plan.md` do not exist in the repo**
-   despite `PLAN.md` referencing both as authoritative.
+4. **`nurse_stress_analysis_plan.md` does not exist in the repo** despite
+   `PLAN.md` referencing it as authoritative.
 5. **v2's open questions 1, 2, 4, 5, 7 remain open** — ICC on the log scale, the
    `eda_med`/`eda_skew` coupling, E4's 1 °C temperature range, Malik truncation of
    real RMSSD, and whether `tags.csv` corroborates the timezone conclusion.

@@ -4,8 +4,7 @@ Executable research plan. **This document follows `nurse_stress_analysis_plan.md
 Its five phases, section numbering, exclusion order, effective-N table, decision
 points and week sequencing are carried over and are authoritative.
 
-Read `CLAUDE.md` first. Judgment calls referenced as `JCnn` are defined in
-`judgment_calls.yaml`.
+Judgment calls referenced as `JCnn` are defined in `judgment_calls.yaml`.
 
 ### Notation for changes to the source plan
 
@@ -628,7 +627,7 @@ cohort does." That one does not depend on the detector working.
 
 ---
 
-## Task index for Claude Code
+## Task index
 
 | Task | Section | Freezes |
 |---|---|---|

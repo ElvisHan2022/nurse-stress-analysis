@@ -12,11 +12,11 @@ __pycache__/
 ~$*.md
 ~$*.docx
 
-# Session tooling, not part of the analysis
+# Local tool and editor directories
 .remember/
 .claude/
-
-# Pixi environment
+.vscode/
+.idea/
 .pixi/
 .DS_Store
 

@@ -217,9 +217,8 @@
   </div>
 
   <h2>Missing dependencies</h2>
-  <p>Three files referenced by <code>PLAN.md</code> don't exist anywhere in the repo:</p>
+  <p>Two files referenced by <code>PLAN.md</code> don't exist anywhere in the repo:</p>
   <ul>
-    <li><code>CLAUDE.md</code> — the plan opens with "Read CLAUDE.md first."</li>
     <li><code>judgment_calls.yaml</code> — <code>JC02</code> through <code>JC28</code> are referenced throughout and currently resolve to nothing. The HTML guide's registry is the human-readable version of this file, so it is reconstructable, but that's real work and someone should own it.</li>
     <li><code>nurse_stress_analysis_plan.md</code> — the "source plan" that <code>PLAN.md</code> describes as authoritative for its phases, exclusion order, and week sequencing.</li>
   </ul>
@@ -244,8 +243,8 @@
       <p>If the propensity model exists somewhere, pushing it saves re-deriving it. If it doesn't, A7 produces it and we compare.</p>
     </div>
     <div class="ask">
-      <b>Do <code>CLAUDE.md</code> and the source plan exist on your side?</b>
-      <p>Neither is in the repo. If they're local to your machine, they should be committed before anyone executes against the plan.</p>
+      <b>Does the source plan exist on your side?</b>
+      <p>It is not in the repo. If it is local to your machine, it should be committed before anyone executes against the plan.</p>
     </div>
     <div class="ask">
       <b>Who reconstructs <code>judgment_calls.yaml</code>?</b>

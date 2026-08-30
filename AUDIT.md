@@ -1,7 +1,7 @@
 # AUDIT.md
 
-Instruction file for Claude Code. Run the initial data audit for the nurse stress
-project, before any modeling and before `PLAN.md` Phase 1 freezes anything.
+Executable specification for the initial data audit. Run this before any
+modeling and before `PLAN.md` Phase 1 freezes anything.
 
 **Invocation:** `Read AUDIT.md and run the full audit.`
 Or one section at a time: `Read AUDIT.md and run section A4.`
