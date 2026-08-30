@@ -55,8 +55,9 @@ null decisively ($0.765$ against $0.498\pm0.010$) while still recovering only
 pretraining anyway. Over 1,238 unlabelled hours it matches random
 initialisation at every label count from 25 to 138 episodes, and both trail the
 hand-crafted baseline by $0.11$ AUC. Severity prediction, the one task here
-needing no constructed negatives, is also at chance. The constraint is the
-label supply, and no amount of unlabelled data substitutes for it.
+needing no constructed negatives, is also at chance. On this dataset the
+constraint is the label supply, and pretraining as we implemented it does not
+substitute for it.
 \end{abstract}
 
 \section{Introduction}
@@ -316,6 +317,8 @@ probes pass in all arms. AUC is prevalence-invariant, so arms with different
 denominators remain comparable.}
 \label{tab:sens}
 \centering
+\small
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lrrrrrr}
 \toprule
 Arm & Participants & Balance spread & Movement only & Time only & Skin only & Full \\
@@ -367,6 +370,7 @@ translation in Section \ref{sec:data}. The seed range on episode recall is
 comparable to the estimate itself and is quoted wherever it appears.}
 \label{tab:baseline}
 \centering
+\small
 \begin{tabular}{lrrrr}
 \toprule
 Alarms per worn hour & False positive rate & Window recall & Episode recall & Seed range \\
@@ -500,9 +504,15 @@ Episodes used & Linear probe & Full fine-tune & Random init & Probe $-$ random \
 \end{tabular}
 \end{table}
 
-Table \ref{tab:ssl} gives two negatives. Pretrained minus randomly initialised
-sits between $-0.024$ and $-0.003$ at every label count, so there is no
-separation at low counts, which was the entire hypothesis. And every arm trails
+Table \ref{tab:ssl} gives two negatives, and they are not equally strong.
+Pretrained minus randomly initialised sits between $-0.024$ and $-0.003$ at
+every label count. Three of those four differences are smaller than the
+baseline's own seed spread of $0.0095$, so the honest statement is that no
+separation is \emph{detectable} at this resolution rather than that none
+exists; each cell is a single run, and resolving a difference this small would
+need repeated draws we did not make. The direction is consistent across all
+four counts and never favours pretraining, which is what makes the absence of a
+low-count advantage, the entire hypothesis, informative. And every arm trails
 the hand-crafted baseline by roughly $0.11$ AUC.
 
 That random initialisation matches pretraining is the informative part. The
@@ -514,8 +524,10 @@ favourable still.
 
 \paragraph{Severity, where no negatives are constructed.} Detection could in
 principle be blamed on our constructed comparison group. Severity cannot: it
-runs on the 186 rated episodes with sensor coverage and needs no negatives at
-all. We fit cumulative binary links rather than a three-class model, because 17
+runs on 186 episodes rather than the 138 used for detection, because the
+detection task additionally requires each episode to survive the negative
+construction and the high-severity filter, while severity keeps the low- and
+medium-severity episodes it needs and requires no negatives at all. We fit cumulative binary links rather than a three-class model, because 17
 medium-severity episodes across the cohort and six of ten participants with
 none make the middle class unlearnable, and because the rating scales are not
 comparable between people. Both links sit at chance, $0.4964$ for severity
