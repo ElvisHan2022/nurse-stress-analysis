@@ -185,11 +185,14 @@ survives Section \ref{sec:negatives}, and otherwise \textbf{excluded} rather
 than set to zero.
 
 \paragraph{The primary metric, defined before use.} An \textbf{episode is
-detected} when at least half its windows fire, a fraction fixed in advance. The
-\textbf{alarm rate} is per hour of worn time, not per hour of sampled negative
-time, and the distinction matters: our scored sample is 43.6\% positive by
-construction while true window prevalence is 6.49\%, so counting alarms against
-the sample would understate the deployed rate about sevenfold. We therefore fix
+detected} when at least half its windows fire, a fraction fixed in advance, and
+\textbf{episode recall} is the share of episodes detected, which we report
+rather than window recall because what matters is whether an episode was caught
+at all. The \textbf{alarm rate} is per
+hour of worn time rather than per hour of sampled negative time. Our scored
+sample is 43.6\% positive by construction while true window prevalence is
+6.49\%, so counting alarms against the sample would understate the deployed
+rate about sevenfold. We therefore fix
 the operating point on the false positive rate, which is prevalence-invariant,
 and translate. At 28.1 negative windows per worn hour, one alarm per hour is a
 false positive rate of $0.0356$.
@@ -513,19 +516,23 @@ we ran it past our own stopping point.
 A dilated 1D convolutional encoder is trained by masked reconstruction \cite{haresamudram2020} over all
 609 sessions and all 15 participants, including the five outside the supervised
 cohort, since the pretext task needs no labels. The corpus is 1{,}238 usable
-hours at 1 Hz over five causally normalised channels, giving 68k windows. That is a small corpus for this family of methods: the largest wearable self-supervision study we know of pretrains on 700{,}000 person-days \cite{yuan2024}, against roughly 52 here, so a null result at this scale does not settle the approach. Mask
+hours at 1 Hz over five causally normalised channels, giving 68k windows. The largest wearable self-supervision study pretrains on 700{,}000
+person-days \cite{yuan2024} against roughly 52 here, so a null at this scale
+does not settle the approach. Mask
 spans of 30 to 120 s are fixed a priori rather than tuned on downstream
 performance, which would leak through the selection process. Contrastive
 learning was rejected deliberately: its standard augmentations include
 amplitude scaling, and skin conductance amplitude is the signal Section
 \ref{sec:labels} identified.
 
-\paragraph{The identity gate.} A linear probe on frozen embeddings recovers
-participant identity at $0.168$ against a chance rate of $0.067$, the encoder
-having been trained across all fifteen participants, while the hand-crafted
-reference of $0.768$ is a ten-way problem at chance $0.100$. The accuracies are
-not commensurable and we compare them as lift over chance: $2.5\times$ for the
-encoder against $7.7\times$ for the features. The encoder did not learn
+\paragraph{The identity gate.} A linear probe is a logistic regression
+fitted on the encoder's frozen output, so what it recovers is a property of the
+representation rather than of the classifier. We use one to ask whether the
+encoder learned to recognise the participant, since a model that identifies the
+person can score well without detecting the state. It recovers identity at $0.168$ against a chance rate of
+$0.067$ across fifteen participants, a lift of $2.5\times$, where the
+hand-crafted features reach $0.768$ on a ten-way problem at chance $0.100$, a
+lift of $7.7\times$. The encoder did not learn
 identity, so the phase proceeds. Whether $0.168$ instead indicates a weak representation is
 settled by the sweep.
 
@@ -601,10 +608,10 @@ labels are retrospective reports of intervals treated here as uniform states,
 the negative class is constructed rather than observed, and one channel of
 four responds at onset.
 
-This bears on the published $F_1$ of $0.99$ \cite{mathur2024}. We are not
-able to diagnose another group's protocol from a published summary, so we
-note the discrepancy without attributing a cause and report our own
-protocol in full so the comparison can be made.
+This bears on the published $F_1$ of $0.99$ \cite{mathur2024}, which we note
+without attributing a cause, since another group's protocol cannot be diagnosed
+from a published summary. We report our own in full so the comparison can be
+made.
 
 The consequence falls on collection rather than modelling, and one change
 would matter more than the rest. A study of this kind should record explicit
@@ -632,9 +639,7 @@ floor at $0.048$.
 
 The pretraining result carries its own qualifications. The encoder saw every
 participant, so Table \ref{tab:ssl} reports transductive upper bounds rather
-than estimates for an unseen person; per-fold pretraining is the clean
-alternative and costs ten times the compute. One architecture and one training
-budget were tried. A weak representation and one genuinely free of
+than estimates for an unseen person; One architecture and one training budget were tried. A weak representation and one genuinely free of
 participant identity give the same low probe accuracy; we separate them only
 indirectly, through the sweep. The severity task rests on 14
 medium-severity episodes, which is why we report cumulative links and a
@@ -642,12 +647,17 @@ collapsed task rather than a three-class model.
 
 \section{Conclusion}
 
-The experiment we set out to run was never within reach. Establishing its
-prerequisites consumed the study, and the prerequisites were the finding. A
-protocol that records only the episodes a participant chooses to flag cannot
-describe the time between them, and that is how ambulatory affect sensing is
-almost always collected. This dataset does not lack hours of physiology. It
-lacks the annotation that would make them interpretable.
+The experiment we set out to run was never within reach, and establishing its
+prerequisites consumed the study. A protocol that records only the episodes a
+participant chooses to flag cannot describe the time between them, and that is
+how ambulatory affect sensing is almost always collected. This dataset does not
+lack hours of physiology, it lacks the annotation that would make them
+interpretable.
+
+The next study therefore does not need a larger cohort or a deeper encoder. It
+needs a protocol that prompts for calm periods on the same schedule it accepts
+reports of stress. A few hundred observed negatives would turn the
+label-efficiency curve we could only bound here into a measurement.
 
 \begin{thebibliography}{20}
 
