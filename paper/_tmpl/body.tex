@@ -1,34 +1,3 @@
-\documentclass{article}
-
-% NeurIPS 2025 style. Use \usepackage[preprint]{neurips_2025} for a preprint,
-% or \usepackage[final]{neurips_2025} for a camera-ready version.
-% The only supported style file for NeurIPS 2026 is neurips_2026.sty,
-% obtainable from neurips.cc. Options: final, preprint, nonatbib.
-% Use [preprint] for arXiv, no option for anonymous submission.
-\usepackage{neurips_2026}
-
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{hyperref}
-\usepackage{url}
-\usepackage{booktabs}   % required by the instructions for table rules
-\usepackage{amsfonts}
-\usepackage{amsmath}
-\usepackage{nicefrac}
-\usepackage{microtype}
-\usepackage{graphicx}
-\usepackage{xcolor}   % \answerYes/No/NA use \textcolor
-
-\title{You Can't Pretrain Your Way Out of a Missing Negative Class:\\
-Nurse Stress Detection from Wearables}
-
-\author{%
-  Anonymous Author(s) \\
-  Affiliation \\
-  Address \\
-  \texttt{email} \\
-}
-
 \begin{document}
 
 \maketitle
@@ -71,14 +40,7 @@ cannot resolve when during a shift the stress occurred.
 Wrist-worn sensors promise to fix that. Skin conductance, heart rate, skin
 temperature, and movement can be recorded continuously and unobtrusively for a
 week at a time, and skin conductance in particular is driven almost entirely by
-the sympathetic nervous system with little voluntary control, which is why it
-has long been the channel of choice for laboratory work on arousal. Moving that
-measurement from the laboratory onto a hospital ward changes the problem in
-ways that are easy to underestimate. The wrist is in constant motion, and the
-same physical exertion that raises heart rate and sweating during a stressful
-episode raises them during an unremarkable one. Ground truth stops being an
-experimenter-controlled stimulus and becomes whatever the participant remembers
-to report, when she has a moment to report it. A public dataset
+the sympathetic nervous system with little voluntary control. A public dataset
 now exists for testing the idea. Hosseini et al.\ \cite{hosseini2022} recorded
 15 nurses for one week each during the COVID-19 outbreak, with periodic
 smartphone-administered stress reports alongside the sensor streams.
@@ -181,38 +143,8 @@ variation, the interquartile range over the median. Those four score 0.44 to
 0.72 against 1.04 to 5.14 for the remaining eleven, with no overlap. Their
 signal is flat, not merely small.
 
-\begin{table}[t]
-\caption{What the study is left with. Each row removes something for a stated
-reason, and the count is what the next stage actually operates on. The three
-totals are the same data described three ways; only two of them are
-denominators.}
-\label{tab:attrition}
-\centering
-\begin{tabular}{llr}
-\toprule
-Step & Reason & Remaining \\
-\midrule
-Recording sessions            & as deposited                     & 609 \\
-\quad after the length filter & shorter than one analysis window & 517 \\
-\addlinespace
-Survey rows                   & as deposited                     & 358 \\
-\quad rated                   & a severity was recorded          & 245 \\
-\quad high severity only      & the binary task                  & 179 \\
-\quad after merging overlaps  & twelve overlapping pairs         & 153 \\
-\quad with sensor coverage    & a recording exists at that time  & \textbf{138} \\
-\addlinespace
-Participants                  & as deposited                     & 15 \\
-\quad after exclusions        & no negatives, or a flat channel  & \textbf{10} \\
-\midrule
-\multicolumn{2}{l}{Windows, a compute statistic} & 24{,}334 \\
-\multicolumn{2}{l}{\textbf{Episodes}, the denominator for detection} & \textbf{138} \\
-\multicolumn{2}{l}{\textbf{Participants}, for generalising to a new person} & \textbf{10} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 \textbf{What survives is 10 participants, 24{,}334 windows, and 138
-high-severity episodes} (Table \ref{tab:attrition}). Of the three counts, only two are denominators: the
+high-severity episodes.} Of the three counts, only two are denominators: the
 window count is a compute statistic, the honest denominator for detecting an
 episode is 138, and for generalising to a new person it is 10.
 
@@ -607,92 +539,3 @@ of what was missing, and the answer is labels: explicit non-stress intervals,
 finer onset resolution, and skin conductance quality good enough that a
 participant's only responsive channel is not flat.
 
-\begin{thebibliography}{9}
-
-\bibitem{elkan2008}
-C.~Elkan and K.~Noto.
-\newblock Learning classifiers from only positive and unlabeled data.
-\newblock In \emph{Proceedings of the 14th ACM SIGKDD International Conference
-  on Knowledge Discovery and Data Mining}, 2008.
-\newblock DOI: 10.1145/1401890.1401920.
-
-\bibitem{hosseini2022}
-S.~Hosseini, R.~Gottumukkala, S.~Katragadda, R.~T. Bhupatiraju, Z.~Ashkar,
-  C.~W. Borst, and K.~Cochran.
-\newblock A multimodal sensor dataset for continuous stress detection of nurses
-  in a hospital.
-\newblock \emph{Scientific Data}, 9:255, 2022.
-\newblock DOI: 10.1038/s41597-022-01361-y.
-
-\bibitem{kiryo2017}
-R.~Kiryo, G.~Niu, M.~C. du~Plessis, and M.~Sugiyama.
-\newblock Positive-unlabeled learning with non-negative risk estimator.
-\newblock In \emph{Advances in Neural Information Processing Systems 30}, 2017.
-\newblock arXiv:1703.00593.
-
-\bibitem{mathur2024}
-A.~Mathur et~al.
-\newblock Body sensor-based multimodal nurse stress detection using machine
-  learning.
-\newblock In \emph{2024 16th International Conference on Communication Systems
-  and Networks (COMSNETS)}, 2024.
-
-\bibitem{munoz2015}
-M.~L. Munoz, A.~van~Roon, H.~Riese, C.~Thio, E.~Oostenbroek, I.~Westrik,
-  E.~J.~C. de~Geus, R.~Gansevoort, J.~Lefrandt, I.~M. Nolte, and H.~Snieder.
-\newblock Validity of (ultra-)short recordings for heart rate variability
-  measurements.
-\newblock \emph{PLOS ONE}, 10(9):e0138921, 2015.
-\newblock DOI: 10.1371/journal.pone.0138921.
-
-\bibitem{orini2023}
-M.~Orini et~al.
-\newblock Long-term association of ultra-short heart rate variability with
-  cardiovascular events.
-\newblock \emph{Scientific Reports}, 13, 2023.
-
-\end{thebibliography}
-
-
-\newpage
-
-\appendix
-
-\section{Broader impacts}
-
-The application is monitoring of employees during work, and that is worth
-naming plainly. A reliable stress detector deployed in a hospital could direct
-support toward staff who need it, which is the motivating case. The same
-instrument could as easily support surveillance, scheduling penalties, or
-insurance decisions, and the people measured are in a weak position to refuse.
-Consent to be monitored by an employer is not freely given in the way consent
-to a research study is.
-
-Our result bears on this directly. A detector recovering one episode in ten at
-a deployable alarm rate is not fit for any of those uses, including the
-benevolent one, and two of ten participants are undetectable at any usable
-threshold. We would regard deployment on the strength of results at this level
-as harmful, and we note that a published figure of $F_1 = 0.99$ on this same
-dataset could be read as licensing exactly that. Reporting the achievable
-number honestly is the contribution most relevant to impact here.
-
-The cohort is ten female nurses at one hospital during a pandemic. Any
-performance claim generalised beyond that population would be unsupported, and
-differential performance across groups cannot be assessed at this sample size.
-
-\section{Compute} All experiments run on a single laptop CPU with no GPU.
-Feature extraction over 387 sessions takes 107 s; the complete set
-of reported experiments completes in about half an hour beyond feature
-extraction. Pretraining over 68k windows takes 192 s for twelve epochs, and the
-label-efficiency sweep, which is 120 model fits, takes roughly thirteen
-minutes. The audit that precedes
-them reads the 3.5 GB archive once per section and is likewise
-CPU-bound. No experiment reported here was preceded by a larger unreported
-sweep.
-
-\input{appendix_tables}
-
-\newpage
-\input{checklist}
-
-\end{document}
