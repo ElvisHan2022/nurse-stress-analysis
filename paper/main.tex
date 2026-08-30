@@ -18,8 +18,8 @@
 \usepackage{microtype}
 \usepackage{graphicx}
 
-\title{Nine Percent Labelled: What Has to Be True\\
-Before Self-Supervision Helps}
+\title{You Can't Pretrain Your Way Out of a Missing Negative Class:\\
+Nurse Stress Detection from Wearables}
 
 \author{%
   Anonymous Author(s) \\
@@ -427,14 +427,6 @@ corner, little remains. Two of ten participants detect zero episodes at any
 usable threshold, and one is below chance at AUC $0.388$. We report per fold
 and never average; fold AUC ranges from $0.388$ to $0.885$.
 
-\paragraph{Compute.} All experiments run on a single laptop CPU with no GPU.
-Feature extraction over 387 sessions takes 107 s; the complete set
-of reported experiments, including the twenty-draw permutation null and the
-four-arm ratio sensitivity, completes in under an hour. The audit that precedes
-them reads the 3.5 GB archive once per section and is likewise
-CPU-bound. No experiment reported here was preceded by a larger unreported
-sweep.
-
 \subsection{Two controls}
 
 \begin{table}[t]
@@ -618,28 +610,6 @@ them by the square root of the fold count. The permutation null uses twenty
 draws, so its $p$-value floor is $0.048$; the observed value exceeds every draw
 but a finer resolution would require more permutations.
 
-\section{Broader impacts}
-
-The application is monitoring of employees during work, and that is worth
-naming plainly. A reliable stress detector deployed in a hospital could direct
-support toward staff who need it, which is the motivating case. The same
-instrument could as easily support surveillance, scheduling penalties, or
-insurance decisions, and the people measured are in a weak position to refuse.
-Consent to be monitored by an employer is not freely given in the way consent
-to a research study is.
-
-Our result bears on this directly. A detector recovering one episode in ten at
-a deployable alarm rate is not fit for any of those uses, including the
-benevolent one, and two of ten participants are undetectable at any usable
-threshold. We would regard deployment on the strength of results at this level
-as harmful, and we note that a published figure of $F_1 = 0.99$ on this same
-dataset could be read as licensing exactly that. Reporting the achievable
-number honestly is the contribution most relevant to impact here.
-
-The cohort is ten female nurses at one hospital during a pandemic. Any
-performance claim generalised beyond that population would be unsupported, and
-differential performance across groups cannot be assessed at this sample size.
-
 \section{Conclusion}
 
 We intended to test whether self-supervised pretraining helps when
@@ -710,5 +680,39 @@ M.~Orini et~al.
 
 ewpage
 \input{checklist}
+
+\appendix
+
+\section{Broader impacts}
+
+The application is monitoring of employees during work, and that is worth
+naming plainly. A reliable stress detector deployed in a hospital could direct
+support toward staff who need it, which is the motivating case. The same
+instrument could as easily support surveillance, scheduling penalties, or
+insurance decisions, and the people measured are in a weak position to refuse.
+Consent to be monitored by an employer is not freely given in the way consent
+to a research study is.
+
+Our result bears on this directly. A detector recovering one episode in ten at
+a deployable alarm rate is not fit for any of those uses, including the
+benevolent one, and two of ten participants are undetectable at any usable
+threshold. We would regard deployment on the strength of results at this level
+as harmful, and we note that a published figure of $F_1 = 0.99$ on this same
+dataset could be read as licensing exactly that. Reporting the achievable
+number honestly is the contribution most relevant to impact here.
+
+The cohort is ten female nurses at one hospital during a pandemic. Any
+performance claim generalised beyond that population would be unsupported, and
+differential performance across groups cannot be assessed at this sample size.
+
+\section{Compute} All experiments run on a single laptop CPU with no GPU.
+Feature extraction over 387 sessions takes 107 s; the complete set
+of reported experiments, including the twenty-draw permutation null and the
+four-arm ratio sensitivity, completes in under an hour. The audit that precedes
+them reads the 3.5 GB archive once per section and is likewise
+CPU-bound. No experiment reported here was preceded by a larger unreported
+sweep.
+
+
 
 \end{document}
