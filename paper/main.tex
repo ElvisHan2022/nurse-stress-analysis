@@ -609,6 +609,12 @@ the labels nor a representation learned from 1{,}238 unlabelled hours. And
 severity, the one task needing no constructed negatives, is at chance, which
 rules out our construction as the cause.
 
+For anyone assembling a dataset of this kind, the ordering matters more than
+the modelling. A protocol that captures non-stress intervals costs nothing
+extra at collection time and decides whether any later comparison is
+interpretable, whereas the choice of encoder can be revisited at any point
+afterwards.
+
 This bears on the published $F_1$ of $0.99$ \cite{mathur2024}, which we note
 without attributing a cause, since another group's protocol cannot be diagnosed
 from a published summary. We report our own in full so the comparison can be
@@ -636,15 +642,11 @@ normalisation constants, the denominator floor and the output clip, are
 recorded and varied rather than defended. Ten folds is underpowered for the paired
 comparisons, so we state spreads descriptively rather than dividing by the root
 of the fold count, and the permutation null's twenty draws put its $p$-value
-floor at $0.048$.
-
-The pretraining result carries its own qualifications. The encoder saw every
-participant, so Table \ref{tab:ssl} reports transductive upper bounds rather
-than estimates for an unseen person; One architecture and one training budget were tried. A weak representation and one genuinely free of
-participant identity give the same low probe accuracy; we separate them only
-indirectly, through the sweep. The severity task rests on 14
-medium-severity episodes, which is why we report cumulative links and a
-collapsed task rather than a three-class model.
+floor at $0.048$. The severity task rests on 14 medium-severity episodes, which is why we
+report cumulative links and a collapsed task rather than a three-class model,
+and the pretraining comparison is transductive, since the encoder saw every
+participant, so Table \ref{tab:ssl} reports upper bounds rather than estimates
+for an unseen person.
 
 \section{Conclusion}
 
