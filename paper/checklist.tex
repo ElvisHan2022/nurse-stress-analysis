@@ -5,12 +5,12 @@
 \item {\bf Claims}
     \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
     \item[] Answer: \answerYes{}
-    \item[] Justification: The abstract states the negative result and its boundary explicitly: we eliminated the label-treatment axis and not the representation axis, and Section 7.1 repeats this rather than generalising past it. The intended contribution, an account of the prerequisites for self-supervision on sparsely labelled physiological data, matches what is delivered. Every quantity quoted in the abstract appears with its seed range where one exists.
+    \item[] Justification: The abstract reports three nulls in the order the paper establishes them: label treatments, learned representations, and severity. Section 7 does not generalise past them, and the transductive status of the pretraining results is stated in the abstract, in Section 7, and in the limitations rather than only once. Every quantity quoted in the abstract appears with its seed range where one exists.
 
 \item {\bf Limitations}
     \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
     \item[] Answer: \answerYes{}
-    \item[] Justification: Section 8 is a dedicated limitations section. It names the narrow cohort, the constructed rather than observed negative class and the consequent inestimability of precision, the unidentifiable class prior, the undertuned positive-unlabelled arm and why its negative result is weaker evidence than the naive comparator, the two-learner search space, the 33 episodes with no sensor coverage, the two normalisation constants chosen rather than derived, the underpowered ten-fold comparisons, and the resolution floor of a twenty-draw permutation test.
+    \item[] Justification: Section 8 is a dedicated limitations section. It names the narrow cohort, the constructed rather than observed negative class and the consequent inestimability of precision, the unidentifiable class prior, the undertuned positive-unlabelled arm and why its negative result is weaker evidence than the naive comparator, the two-learner search space, the 33 episodes with no sensor coverage, the two normalisation constants chosen rather than derived, the underpowered ten-fold comparisons, the resolution floor of a twenty-draw permutation test, and, for the pretraining arm, its transductive design, its single architecture and training budget, and the fact that a weak representation and a clean one are distinguished only by the downstream sweep.
 
 \item {\bf Theory assumptions and proofs}
     \item[] Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof?
@@ -30,7 +30,7 @@
 \item {\bf Experimental setting/details}
     \item[] Question: Does the paper specify all the training and test details (e.g., data splits, hyperparameters, how they were chosen, type of optimizer) necessary to understand the results?
     \item[] Answer: \answerYes{}
-    \item[] Justification: Sections 2, 4 and 5 give the splits (leave-one-participant-out, grouped on participant, with the reason stated), the learner and its class weighting, the normalisation window and its floor and clip, the negative ratio and the sensitivity analysis over it, and the class prior grid for the positive-unlabelled arm. Choices fixed before results were seen are identified as such, including the episode-detection fraction and the decision rule in Section 6.
+    \item[] Justification: Sections 2, 4 and 5 give the splits (leave-one-participant-out, grouped on participant, with the reason stated), the learner and its class weighting, the normalisation window and its floor and clip, the negative ratio and the sensitivity analysis over it, and the class prior grid for the positive-unlabelled arm. Section 7 gives the pretraining corpus, the encoder architecture, the mask-span range and that it was fixed a priori, the number of epochs, and the three fine-tuning arms with their learning rates. Choices fixed before results were seen are identified as such, including the episode-detection fraction, the decision rule in Section 6, and the mask span.
 
 \item {\bf Experiment statistical significance}
     \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
@@ -40,7 +40,7 @@
 \item {\bf Experiments compute resources}
     \item[] Question: For each experiment, does the paper provide sufficient information on the computer resources (type of compute workers, memory, time of execution) needed to reproduce the experiments?
     \item[] Answer: \answerYes{}
-    \item[] Justification: A compute section in Appendix B states that all experiments run on a single laptop CPU with no GPU, gives the feature-extraction time over 387 sessions, and states that the complete set of reported experiments finishes in under an hour. It also records that no reported experiment was preceded by a larger unreported sweep.
+    \item[] Justification: A compute section in Appendix B states that all experiments run on a single laptop CPU with no GPU, gives the feature-extraction time over 387 sessions, the pretraining time over 68k windows, and the runtime of the label-efficiency sweep, and states that the complete set of reported experiments finishes in about half an hour beyond feature extraction. It also records that no reported experiment was preceded by a larger unreported sweep.
 
 \item {\bf Code of ethics}
     \item[] Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics \url{https://neurips.cc/public/EthicsGuidelines}?

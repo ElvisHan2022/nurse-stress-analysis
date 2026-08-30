@@ -1,10 +1,12 @@
 \section{Per-participant cohort and negative construction}
 \label{app:cohort}
 
-Counts after the Phase 1 exclusions, for negative-sampling seed 0. The
-target ratio is 2.14, the maximum achievable uniformly across the cohort;
-two participants fall short because their eligible negative pool is
-exhausted before the target is met.
+The modelling set behind every reported result: the ten retained
+participants at the fixed negative-to-positive ratio of 1.31 adopted in
+Section 4.3, for negative-sampling seed 0. A ratio below the 1.31 target
+means the eligible negative pool was exhausted before the target was met;
+the lowest, at 1.03, sets the residual balance spread of
+$1.28\times$ quoted in Table 3.
 
 \begin{table}[h]
 \centering
@@ -12,21 +14,21 @@ exhausted before the target is met.
 \toprule
 Participant & Positive windows & Negative windows & Ratio \\
 \midrule
-15 & 79 & 168 & 2.13 \\
-5C & 68 & 117 & 1.72 \\
-6B & 182 & 341 & 1.87 \\
-7A & 248 & 526 & 2.12 \\
-83 & 314 & 672 & 2.14 \\
-8B$^{\dagger}$ & 74 & 97 & 1.31 \\
-94$^{\dagger}$ & 34 & 73 & 2.15 \\
-BG & 154 & 331 & 2.15 \\
-E4 & 310 & 663 & 2.14 \\
-F5 & 116 & 248 & 2.14 \\
+8B & 74 & 76 & 1.03 \\
+5C & 68 & 84 & 1.24 \\
+94 & 34 & 44 & 1.29 \\
+7A & 248 & 324 & 1.31 \\
+6B & 182 & 238 & 1.31 \\
+E4 & 310 & 406 & 1.31 \\
+F5 & 116 & 152 & 1.31 \\
+83 & 314 & 412 & 1.31 \\
+15 & 79 & 104 & 1.32 \\
+BG & 154 & 203 & 1.32 \\
 \midrule
-Total & 1579 & 3236 & 2.05 \\
+Total & 1579 & 2043 & 1.29 \\
 \bottomrule
 \end{tabular}
-\caption{Cohort and negative construction. $\dagger$ marks the two participants whose achieved ratio falls below the 2.14 target.}
+\caption{Cohort and negative construction at the adopted ratio of 1.31, sorted by achieved ratio.}
 \end{table}
 
 \section{Exclusion cascade}
