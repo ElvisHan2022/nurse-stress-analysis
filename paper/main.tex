@@ -36,23 +36,24 @@ Nurse Stress from Wearables}
 \begin{abstract}
 Wearable sensors record continuously, so a week on a nurse's wrist produces far
 more physiology than anyone will label, and self-supervised pretraining is the
-standard way to use the remainder. We ask what has to hold before that is worth
-attempting. The setting is a public dataset of fifteen hospital nurses
-monitored during the COVID-19 pandemic, 1{,}251.7 hours of recording against
-358 self-reported stress episodes, leaving 91\% of the recorded time
-unlabelled. Pretraining is only meaningful against a supervised baseline worth
-improving on, and none is available here. Nurses logged an episode in a
-smartphone application when they noticed stress and were never prompted to
-record a calm period, so every entry marks stress and the number attached is
-its severity rather than its presence. Building a baseline therefore means
-constructing the unstressed class the collection never captured, and that
-construction is what this paper reports. From 609 recordings and fifteen
-participants we arrive at 138 episodes from ten, testing at each step whether
-what survives is real rather than manufactured. Skin conductance rises at
-reported onset in 64.3\% of episodes ($p=0.0009$), while heart rate is
-indistinguishable from chance ($p=0.80$). A comparison group built by
-activity-matched sampling detects neither movement nor shift schedule (both AUC
-$0.51$), and a baseline trained on it reaches AUC $0.765$ against a
+standard way to use the remainder. We study a public dataset of fifteen
+hospital nurses monitored during the COVID-19 pandemic, 1{,}251.7 hours of
+recording against 358 self-reported stress episodes, leaving 91\% of the
+recorded time unlabelled. In this paper we take that ratio, together with the
+absence of any recorded unstressed state, as the starting conditions for
+carrying wearable stress detection from a supervised setting into a
+self-supervised one. We construct a comparison group by activity-matched
+sampling within participant, check it with falsification probes, establish a
+hand-crafted baseline, compare three label treatments including non-negative
+positive-unlabelled estimation, and pretrain a masked-reconstruction encoder
+over the unlabelled remainder to measure label efficiency against it. That absence is structural. Nurses logged an
+episode in a smartphone application when they noticed stress and were never
+prompted to record a calm period, so every entry marks stress and the number
+attached is severity rather than presence. From 609 recordings and fifteen participants we arrive at 138 episodes from
+ten, testing at each step whether what survives is real. Skin conductance rises at reported onset in
+64.3\% of episodes ($p=0.0009$), while heart rate is indistinguishable from
+chance ($p=0.80$). The comparison group detects neither movement nor shift
+schedule (both AUC $0.51$), and the baseline reaches AUC $0.765$ against a
 within-participant permutation null of $0.497\pm0.010$, recovering 10.6\% of
 episodes at one false alarm per worn hour. Pretraining over 1,238 unlabelled
 hours then matches random initialisation at every label count from 25 to 138
