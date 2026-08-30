@@ -16,8 +16,8 @@
 \usepackage{graphicx}
 \usepackage{siunitx}
 
-\title{When the Ceiling Is the Data: A Falsification-First Audit of\\
-Wearable Stress Detection in Nurses}
+\title{Nine Percent Labelled: What Has to Be True\\
+Before Self-Supervision Helps}
 
 \author{%
   Elvis Han\thanks{Equal contribution.} \\
@@ -34,74 +34,82 @@ Wearable Stress Detection in Nurses}
 \maketitle
 
 \begin{abstract}
-Wearable stress detection is usually reported as a classification score. We
-argue that on small, self-reported, single-site datasets the more useful
-question is whether the ceiling lies in the method or in the data, and we
-answer it by elimination. Using a public dataset of 15 nurses monitored for one
-week each during the COVID-19 pandemic, we first establish that the labels mark
-a physiologically distinguishable state: skin conductance rises at reported
-onset in 64.3\% of episodes (sign test $p = 0.0009$), while heart rate is
-indistinguishable from a coin flip (48.6\%, $p = 0.80$). We then construct a
-negative class, which the dataset does not contain, by activity-matched
-sampling from unlabelled time, and show through falsification probes that the
-resulting classifier is neither an activity detector (AUC 0.51) nor a
-shift-schedule detector (AUC 0.51). A gradient-boosting baseline reaches
-AUC 0.765 but recovers only 10.6\% of episodes at one false alarm per worn
-hour, and two of ten subjects are undetectable at any usable threshold. Three
-distinct treatments of the labels, including non-negative positive-unlabelled
-risk estimation across a bracketed class prior, all fail to improve on this.
-We report two findings that run against expectation: careful negative
-construction improves rather than inflates performance, and a widely quoted
-accuracy figure on this dataset is difficult to reconcile with
-subject-grouped evaluation. We conclude that the binding constraint is the
-label supply, not the model, and we quantify what a future collection would
-need.
+We set out to apply self-supervised pretraining to nurse stress detection,
+on a dataset where \SI{90.9}{\percent} of recorded sensor time carries no label
+at all. The appeal was obvious: two hundred times more unlabelled than labelled
+data, and a natural pretext task. We never got there, and this paper is an
+account of why that is the more useful result. Pretraining requires two things
+this dataset does not supply. It requires a negative class, and no participant
+ever recorded being unstressed: all 358 survey entries mark an episode a nurse
+flagged, and the rating is its severity. It also requires a baseline worth
+improving on. Establishing both consumed the study. We show that the labels do
+mark a physiological state, but in one channel only: skin conductance rises at
+reported onset in \SI{64.3}{\percent} of episodes ($p = 0.0009$), while heart
+rate is indistinguishable from chance ($p = 0.80$). We construct a negative
+class by activity-matched sampling and verify by falsification that the
+resulting classifier detects neither movement nor shift schedule (both
+AUC $0.51$). The baseline reaches AUC $0.765$, far above a within-subject
+permutation null ($0.498 \pm 0.010$), yet recovers only \SI{10.6}{\percent} of
+episodes at one false alarm per worn hour. A linear model reaches within
+$0.015$ AUC of a boosted one, so capacity is not the constraint; three
+treatments of the labels, including non-negative positive-unlabelled risk
+estimation, all fail to improve on it. We stopped at a threshold fixed in
+advance. Two findings run against expectation: careful negative construction
+improves rather than inflates performance, and a published accuracy figure on
+this dataset is difficult to reconcile with subject-grouped evaluation.
 \end{abstract}
 
 \section{Introduction}
 
 Occupational stress among nurses is associated with burnout, turnover, and
-adverse patient events. Wrist-worn sensors offer a continuous and objective
-alternative to retrospective self-report, and a public dataset now exists for
-studying it: Hosseini et al.\ \cite{hosseini2022} monitored 15 nurses for one
-week each during the COVID-19 outbreak, recording electrodermal activity,
-heart rate, skin temperature, and acceleration, with periodic
-smartphone-administered stress reports.
+adverse patient events. Wrist-worn sensors offer a continuous alternative to
+retrospective self-report, and a public dataset exists for studying it:
+Hosseini et al.\ \cite{hosseini2022} monitored 15 nurses for one week each
+during the COVID-19 outbreak, recording electrodermal activity, heart rate,
+skin temperature, and acceleration, with periodic smartphone-administered
+stress reports.
 
-Published results on this dataset are strong. Mathur et al.\
-\cite{mathur2024} report a weighted $F_1$ of 0.99 for two-level stress
-classification. We were unable to reproduce anything close to this, and our
-audit suggests why: the dataset contains 178 high-stress episodes from
-15 people, adjacent analysis windows are near-duplicates of one another, and
-no negative class was ever recorded.
+The dataset has a property that makes self-supervision attractive. Only
+\SI{9.1}{\percent} of the \SI{1251.7}{\hour} of recording falls inside a rated
+episode. The remaining \SI{90.9}{\percent} is unlabelled physiology, which is
+exactly the regime where masked-reconstruction pretraining is supposed to help:
+learn what ordinary physiology looks like from everything, then fine-tune on
+the little that is labelled. That was our plan.
 
-This paper takes a different posture. Rather than reporting a score, we treat
-the study as a sequence of eliminations against one question:
+Two prerequisites stopped it. Self-supervision does not manufacture a negative
+class, and this dataset has none: every one of the 358 survey rows marks an
+episode a participant flagged, and the number attached is its severity, not its
+presence. Nor does self-supervision have anything to improve on until a
+baseline exists. Building both turned out to be the study.
+
+We therefore report the groundwork rather than the method we intended, and we
+organise it as a sequence of eliminations against one question:
 
 \begin{quote}
-\emph{Is the ceiling on this task set by the method or by the data?}
+\emph{What would have to be true for representation learning to help here?}
 \end{quote}
 
-Each phase of the analysis removes one candidate explanation. Section
-\ref{sec:labels} asks whether the labels mark anything physiological at all.
-Section \ref{sec:negatives} asks whether the constructed comparison group leaks
-a confound. Section \ref{sec:baseline} asks how far standard features and a
-standard learner get. Section \ref{sec:pu} asks whether a different treatment
-of the labels helps. What survives is an argument about the data.
+Section \ref{sec:labels} asks whether the labels mark anything physiological.
+Section \ref{sec:negatives} asks whether the comparison group we build leaks a
+confound. Section \ref{sec:baseline} asks how far standard features and a
+standard learner get, and whether the pipeline manufactures its own signal.
+Section \ref{sec:pu} asks whether a different treatment of the labels helps.
+Each answer narrows what remains.
 
 \paragraph{Contributions.}
 \begin{enumerate}
-\item An event-triggered analysis establishing that only one of four channels
+\item An event-triggered analysis showing that only one of four channels
       responds at reported onset, which reorders the feature priorities for
-      this dataset and, we suspect, for wrist-worn stress detection generally.
+      this dataset.
 \item A negative-class construction with falsification probes, and the finding
       that careful construction \emph{improves} performance rather than
       inflating it, contrary to the usual warning.
-\item A pre-registered decision rule, stated before results were seen, for
-      whether to escalate to representation learning, together with the
-      measurement that answered it.
-\item A quantified account of what limits the task, expressed as the label
-      supply a future collection would need.
+\item A decision rule fixed before results were seen, governing whether to
+      escalate to representation learning, together with the measurement that
+      answered it and an explicit statement of what that measurement does not
+      settle.
+\item Two controls, a second learner and a within-subject permutation null,
+      that separate what the data supports from what the pipeline produces.
 \end{enumerate}
 
 \section{Data and units of analysis}
@@ -112,58 +120,77 @@ of the labels helps. What survives is an argument about the data.
 We use the original Dryad deposit rather than the merged convenience files in
 common circulation. The merged version resamples every channel onto a shared
 grid, which discards the blood volume pulse and inter-beat interval streams and
-therefore removes the only route to heart rate variability. Channels are read
-at their native rates: acceleration at \SI{32}{\hertz}, blood volume pulse at
+removes the only route to heart rate variability. Channels are read at their
+native rates: acceleration at \SI{32}{\hertz}, blood volume pulse at
 \SI{64}{\hertz}, electrodermal activity and temperature at \SI{4}{\hertz}, and
-heart rate at \SI{1}{\hertz}. These rates are read from the file headers.
-Published descriptions giving \SI{72}{\hertz} and \SI{10}{\hertz} for pulse and
+heart rate at \SI{1}{\hertz}, taken from the file headers. Published
+descriptions giving \SI{72}{\hertz} and \SI{10}{\hertz} for pulse and
 temperature disagree with the files themselves, and we follow the files.
 
-The archive contains 609 recording sessions totalling \SI{1251.7}{\hour} across
-250 person-days. The median session is \SI{1.17}{\hour} rather than a full
-shift, so a nurse's week is fragmented across roughly 40 short recordings.
+The archive contains 609 sessions totalling \SI{1251.7}{\hour} across 250
+person-days. The median session is \SI{1.17}{\hour} rather than a full shift,
+so a participant's week is fragmented across roughly 40 short recordings.
 
 \subsection{Clock alignment}
 
 Sensor timestamps are UTC; survey timestamps are bare local wall-clock with no
-zone recorded. Choosing wrongly places nearly every reported episode outside
-its own recording and raises no error. We resolved it empirically by counting,
-under each hypothesis, how many rated episodes start inside a session belonging
-to the same subject. Treating survey times as UTC places 50 of 245 (20.4\%);
-treating them as naive \texttt{America/Chicago} places 212 (86.5\%). A fixed
-five-hour offset reaches 198, so the daylight-saving-aware zone is required:
-the archive spans April to December, and a fixed offset misaligns the winter
-episodes by an hour. Thirty-three rated episodes (13.5\%) fall outside every
-session even under the winning hypothesis and are set aside.
+zone recorded. Choosing wrongly places nearly every episode outside its own
+recording and raises no error. We resolved it by counting, under each
+hypothesis, how many rated episodes start inside a session belonging to the
+same participant. Treating survey times as UTC places 50 of 245
+(\SI{20.4}{\percent}); treating them as naive \texttt{America/Chicago} places
+212 (\SI{86.5}{\percent}). A fixed five-hour offset reaches 198, so the
+daylight-saving-aware zone is required: the archive spans April to December.
+Thirty-three rated episodes (\SI{13.5}{\percent}) fall outside every session
+even under the winning hypothesis and are set aside.
 
-\subsection{Window and label}
+\subsection{Window, label, and the metric}
+\label{sec:metric}
 
 The unit of prediction is a \SI{120}{\second} window with a \SI{60}{\second}
 hop. Two arguments fix this length. No labelled episode is shorter than
 \SI{120}{\second}, and a \SI{300}{\second} window would discard 15 episodes
-outright. Independently, ultra-short heart rate variability studies find
-\SI{120}{\second} sufficient for time-domain measures
-\cite{munoz2015}, with root mean square of successive differences validated
-from recordings as short as \SI{15}{\second} \cite{orini2023}; the classical
-five-minute figure is a recording convention rather than a requirement.
+outright. Independently, ultra-short heart rate variability work finds
+\SI{120}{\second} sufficient for time-domain measures \cite{munoz2015}, with
+root mean square of successive differences validated from recordings as short
+as \SI{15}{\second} \cite{orini2023}; the classical five-minute figure is a
+recording convention rather than a requirement.
 
 A window is \textbf{positive} if at least half of it falls inside a
 high-severity episode. A window is \textbf{negative} only if it survives the
 construction in Section \ref{sec:negatives}. Everything else is
 \textbf{excluded}, not set to zero.
 
+\paragraph{The primary metric, defined before use.} We report
+\emph{episode-level recall at a fixed alarm rate}, and both halves need
+stating.
+
+An \textbf{episode is detected} if at least half of its constituent windows
+fire. The fraction is fixed at one half in advance; we do not tune it.
+
+The \textbf{alarm rate} is expressed per hour of worn time, not per hour of
+sampled negative time. These differ substantially. Our scored sample is
+\SI{43.6}{\percent} positive by construction, whereas true window prevalence
+over all worn windows is \SI{6.49}{\percent}, so counting alarms against the
+sampled negatives would understate the deployed rate roughly sevenfold. We
+therefore fix the operating point on the false positive rate, which is
+prevalence-invariant, and translate: at \SI{6.49}{\percent} prevalence there
+are $28.1$ negative windows per worn hour, so one alarm per hour corresponds to
+a false positive rate of $0.0356$. All operating points below are reported this
+way.
+
 \subsection{The structural problem}
 
-The survey contains 358 rows, of which 245 carry a severity rating, split
-46 low, 20 medium, 179 high. \textbf{None of them means ``not stressed.''}
-Every row is an episode a nurse actively flagged, and the rating is its
+The survey contains 358 rows, of which 245 carry a severity rating, split 46
+low, 20 medium, 179 high. \textbf{None of them means ``not stressed.''} Every
+row is an episode a participant actively flagged, and the rating is its
 severity. The majority labelled class is therefore the most severe one, and
-nine of fifteen subjects have no medium-severity episodes at all.
+nine of fifteen participants have no medium-severity episodes at all.
 
 Two consequences follow. Three-class modelling is unworkable, so we collapse to
 high-severity against a constructed baseline. And the comparison group does not
-exist in the data, which makes this a positive-unlabelled problem
-\cite{elkan2008} rather than ordinary binary classification.
+exist in the data, making this a positive-unlabelled problem \cite{elkan2008}
+rather than ordinary binary classification.
 
 \subsection{Exclusions and cohort}
 
@@ -176,27 +203,27 @@ electrodermal sensor, unrated episodes from both classes, three duplicate
 survey rows, and low- and medium-severity episodes from the binary task. We
 merge twelve overlapping episode pairs to their outer span.
 
-We further remove five subjects. One has no eligible comparison windows at all.
-Four have median skin conductance between \SI{0.07}{} and
+We further remove five participants. One has no eligible comparison windows at
+all. Four have median skin conductance between \SI{0.07}{} and
 \SI{0.11}{\micro\siemens}, at or below the sensor floor. A low median alone
-does not disqualify a subject, since a small but varying signal remains
+does not disqualify a participant, since a small but varying signal remains
 informative after normalisation. The deciding statistic is relative variation,
-the interquartile range divided by the median: these four score 0.44 to 0.72,
-while the remaining eleven score 1.04 to 5.14, with no overlap. Their signal is
-flat, not merely small.
+the interquartile range divided by the median: these four score $0.44$ to
+$0.72$, while the remaining eleven score $1.04$ to $5.14$, with no overlap.
+Their signal is flat, not merely small.
 
-The retained cohort is 10 subjects, 24{,}334 windows, and 138 high-severity
-episodes with sensor coverage. Three counts describe this dataset and only two
-are denominators: the window count is a compute statistic, the honest
-denominator for detecting an episode is 138, and for generalising to a new
-person it is 10.
+The retained cohort is 10 participants, 24{,}334 windows, and 138
+high-severity episodes with sensor coverage. Three counts describe this dataset
+and only two are denominators: the window count is a compute statistic, the
+honest denominator for detecting an episode is 138, and for generalising to a
+new person it is 10.
 
 \section{Do the labels mark anything physiological?}
 \label{sec:labels}
 
 Before building a classifier we ask whether there is anything to classify. We
 align every high-severity episode at its reported onset, normalise each channel
-against the subject's own preceding hour, and compare the first ten minutes
+against the participant's own preceding hour, and compare the first ten minutes
 after onset against the preceding thirty.
 
 \begin{table}[t]
@@ -216,25 +243,29 @@ Heart rate & $-0.067$ & 68/140 (48.6\%) & $p = 0.80$ & $+0.47$ bpm \\
 \end{table}
 
 Table \ref{tab:onset} gives the result. Skin conductance rises at onset in
-64.3\% of episodes, a shift that survives both a sign test and a Wilcoxon
-signed-rank test ($p = 3.3 \times 10^{-6}$), and the raw median shift of
-\SI{0.64}{\micro\siemens} sits on a baseline of \SI{0.68}{\micro\siemens},
-roughly a doubling. Heart rate rises in 48.6\% of episodes, which is
-indistinguishable from chance.
+\SI{64.3}{\percent} of episodes, a shift that survives both a sign test and a
+Wilcoxon signed-rank test ($p = 3.3 \times 10^{-6}$), and the raw median shift
+of \SI{0.64}{\micro\siemens} sits on a baseline of \SI{0.68}{\micro\siemens},
+roughly a doubling. Heart rate rises in \SI{48.6}{\percent} of episodes, which
+is indistinguishable from chance.
 
 \paragraph{Why we report medians.} The pooled mean tells a different and false
 story. It reports an electrodermal shift of $+9.75$ normalised units, of which
-63\% is contributed by five episodes out of 140. The cause is a numerical
-failure in the normalisation rather than a physiological one: the trailing
-interquartile range used as a denominator approaches zero during flat stretches,
-and the largest single value reached $+1600$ where a plausible score is near
-$\pm 3$. We bound the denominator at its empirical first percentile and clip
-the output, and we fix the use of medians and sign tests in advance, because
-the same data yields opposite headlines otherwise.
+\SI{63}{\percent} is contributed by five episodes out of 140. The cause is
+numerical rather than physiological: the trailing interquartile range used as a
+denominator approaches zero during flat stretches, and the largest single value
+reached $+1600$ where a plausible score is near $\pm 3$. We bound the
+denominator at its empirical first percentile, clip the output, and fix the use
+of medians and sign tests in advance, because the same data yields opposite
+headlines otherwise.
 
-This result reorders the rest of the study. The problem is well posed, and it
-is well posed in one channel. Any subsequent result driven by heart rate
-deserves suspicion until explained.
+This analysis is descriptive and uses all episodes; it informs which channels
+enter the feature set but is not itself a predictive claim, and no model is
+selected on it.
+
+The result reorders the rest of the study. The problem is well posed, and it is
+well posed in one channel. Any subsequent result driven by heart rate deserves
+suspicion until explained.
 
 \section{Constructing a comparison group}
 \label{sec:negatives}
@@ -242,12 +273,12 @@ deserves suspicion until explained.
 \subsection{Eligibility}
 
 A candidate negative window must satisfy four conditions: it lies in a session
-of at least thirty minutes; it falls on a subject-day containing at least one
-reported episode; it lies at least thirty minutes from the boundary of any
+of at least thirty minutes; it falls on a participant-day containing at least
+one reported episode; it lies at least thirty minutes from the boundary of any
 reported episode, including unrated ones; and it is not itself positive.
 
-The second condition carries most of the argument. On a day when a nurse filed
-nothing, her silence is uninformative: she may have been calm, or too busy to
+The second condition carries most of the argument. On a day when a participant
+filed nothing, silence is uninformative: she may have been calm, or too busy to
 open the application. On a day when she filed at least one report, she was
 demonstrably engaging with the survey, so silence during the remainder of that
 day is evidence rather than absence of evidence. This condition is also the
@@ -263,25 +294,50 @@ and a classifier would separate them by detecting movement.
 
 We therefore match rather than filter. We bin the positive class into deciles
 of mean acceleration magnitude, and for each bin draw negatives from the same
-bin, \emph{within the same subject}. Global matching would draw negatives
-disproportionately from high-coverage subjects, making subject identity a
-partial label proxy along exactly the axis the evaluation holds out.
+bin, \emph{within the same participant}. Global matching would draw negatives
+disproportionately from high-coverage participants, making participant identity
+a partial label proxy along exactly the axis the evaluation holds out.
 
 \subsection{The negative ratio}
 
 We fix the negative-to-positive ratio uniformly rather than letting each
-subject supply its maximum. The reason is that class balance determines where
-the decision threshold belongs: a fixed model with recall 0.80 and specificity
-0.80 attains $F_1 = 0.727$ in a fold that is one-third positive and
-$F_1 = 0.195$ in a fold that is one-thirtieth positive. Per-fold metrics would
-not be comparable.
+participant supply its maximum, because class balance determines where the
+decision threshold belongs. Table \ref{tab:f1} makes the point concretely: one
+fixed model, recall $0.80$ and specificity $0.80$ throughout, scored on two
+folds differing only in prevalence.
+
+\begin{table}[t]
+\caption{The same model on 100 windows at two prevalences. Recall and
+specificity are held fixed; only the class balance changes. $F_1$ falls from
+$0.727$ to $0.195$ because the false positives are drawn from a much larger
+negative pool.}
+\label{tab:f1}
+\centering
+\begin{tabular}{lrr}
+\toprule
+ & 2:1 fold (33.3\% positive) & 32:1 fold (3.0\% positive) \\
+\midrule
+True positives  & 26.7 & 2.4 \\
+False negatives &  6.7 & 0.6 \\
+False positives & 13.3 & 19.4 \\
+True negatives  & 53.3 & 77.6 \\
+\midrule
+Precision & 0.667 & 0.111 \\
+Recall    & 0.800 & 0.800 \\
+$F_1$     & \textbf{0.727} & \textbf{0.195} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 Exact uniformity is unattainable. The binding constraint is a single cell, one
-subject's highest-activity bin containing 13 positives and 7 candidates, so
-matching every subject exactly would require a ratio below one. We report a
+participant's highest-activity bin containing 13 positives and 7 candidates, so
+matching every participant exactly would require a ratio below one. We report a
 sensitivity analysis across four arms in Table \ref{tab:sens} and fix
-$\text{ratio} = 1.31$, which halves the residual spread from
-$1.64\times$ to $1.28\times$.
+$\text{ratio} = 1.31$, which halves the residual spread from $1.64\times$ to
+$1.28\times$. We note that the alternative arm at $2.14$ yields marginally
+higher AUC; we prefer $1.31$ because comparable per-fold thresholds matter more
+here than a difference of $0.002$, and we report both rather than choosing
+silently.
 
 Negatives are drawn under three random seeds. The seed-to-seed spread is the
 noise floor: any later comparison smaller than it is not a comparison.
@@ -293,71 +349,72 @@ using the same learner as the baseline so that a null result is attributable to
 absence of signal rather than to a weaker model.
 
 \begin{table}[t]
-\caption{Falsification probes and ratio sensitivity, mean of three seeds.
-All probes pass in all arms. Area under the ROC curve is prevalence-invariant,
-so arms with different denominators remain comparable.}
+\caption{Falsification probes and ratio sensitivity, mean of three seeds. All
+probes pass in all arms. Area under the ROC curve is prevalence-invariant, so
+arms with different denominators remain comparable.}
 \label{tab:sens}
 \centering
 \begin{tabular}{lrrrrrr}
 \toprule
-Arm & Subjects & Balance spread & ACC only & Time only & EDA only & Full \\
+Arm & Participants & Balance spread & ACC only & Time only & EDA only & Full \\
 \midrule
 All 10, ratio 1.31   & 10 & $1.28\times$ & 0.513 & 0.507 & 0.768 & 0.749 \\
 All 10, ratio 2.14   & 10 & $1.64\times$ & 0.511 & 0.510 & 0.770 & 0.736 \\
-Drop 8B, ratio 1.31  &  9 & $1.07\times$ & 0.521 & 0.533 & 0.762 & 0.739 \\
-Drop 8B, ratio 2.25  &  9 & $1.30\times$ & 0.517 & 0.525 & 0.765 & 0.726 \\
+Drop one, ratio 1.31 &  9 & $1.07\times$ & 0.521 & 0.533 & 0.762 & 0.739 \\
+Drop one, ratio 2.25 &  9 & $1.30\times$ & 0.517 & 0.525 & 0.765 & 0.726 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-A model given only acceleration reaches AUC 0.513, and one given only the hour
-of day reaches 0.507, against a chance value of 0.500. Both hold in all four
-arms of Table \ref{tab:sens}. The constructed comparison group therefore does
-not leak movement or shift schedule.
+A model given only acceleration reaches AUC $0.513$, and one given only the
+hour of day reaches $0.507$, against a chance value of $0.500$. Both hold in
+all four arms. The constructed comparison group therefore does not leak
+movement or shift schedule.
 
-Subject identity is recoverable from the same features at 0.768 accuracy
-against a chance value of 0.100. We record this as a measurement rather than a
-failure, since physiology genuinely differs between people; it is the reference
-against which any learned representation must later be compared.
+Participant identity is recoverable from the same features at $0.768$ accuracy
+against a chance value of $0.100$. We record this as a measurement rather than
+a failure, since physiology genuinely differs between people; it is the
+reference against which any learned representation would have to be compared.
 
-\section{Baseline}
+\section{Baseline and controls}
 \label{sec:baseline}
 
 Features are extracted at native rates and then aggregated to the window.
 Detecting skin conductance responses on a \SI{1}{\hertz} downsample loses
-roughly 40\% of them, so the common \SI{1}{\hertz} grid is used only for the
-label join and coarse features. The feature set comprises tonic level and
-slope, phasic variability, response count and mean amplitude for electrodermal
-activity; mean, variability, slope, maximum and deviation from a trailing
-median for heart rate; magnitude statistics and a movement fraction for
-acceleration; slope and deviation from a trailing median for temperature, never
-its absolute value, which has an intraclass correlation of 0.52 with subject
-identity and acts as a fingerprint; and hour of day with position in session.
+roughly \SI{40}{\percent} of them, so the common \SI{1}{\hertz} grid is used
+only for the label join and coarse features. The feature set comprises tonic
+level and slope, phasic variability, response count and mean amplitude for
+electrodermal activity; mean, variability, slope, maximum and deviation from a
+trailing median for heart rate; magnitude statistics and a movement fraction
+for acceleration; slope and deviation from a trailing median for temperature,
+never its absolute value, which has an intraclass correlation of $0.52$ with
+participant identity and acts as a fingerprint; and hour of day with position
+in session.
 
 Heart rate variability is excluded from the baseline. Although the inter-beat
-interval file is present in every session, only 5.9\% of \SI{120}{\second}
-windows contain a run of clean consecutive beats long enough to compute it, and
-the archive holds only \SI{39.5}{\hour} of usable beat data out of
-\SI{1251.7}{\hour}. Reported session-level availability of 48\% is eight times
-more flattering than the window-level figure that governs a per-window feature.
+interval file is present in every session, only \SI{5.9}{\percent} of
+\SI{120}{\second} windows contain a run of clean consecutive beats long enough
+to compute it, and the archive holds only \SI{39.5}{\hour} of usable beat data
+out of \SI{1251.7}{\hour}. Reported session-level availability of
+\SI{48}{\percent} is eight times more flattering than the window-level figure
+that governs a per-window feature.
 
 Continuous channels are normalised against a trailing sixty-minute robust
 baseline within session, which uses only past data and is therefore both
-leakage-free and reproducible at deployment.
-
-The model is gradient boosting with balanced class weights, evaluated
-leave-one-subject-out across three negative-sampling seeds.
+leakage-free and reproducible at deployment. The model is gradient boosting
+with balanced class weights, evaluated leave-one-participant-out across three
+negative-sampling seeds.
 
 \begin{table}[t]
-\caption{Baseline performance and operating points. The alarm rate is
-expressed against true worn time using the observed window prevalence of
-6.49\%, not against the sampled negatives, which are enriched roughly
-sevenfold in positives.}
+\caption{Baseline operating points. The alarm rate follows the translation in
+Section \ref{sec:metric}. The seed range on episode recall at one alarm per
+hour is comparable to the estimate itself, and we quote it wherever the
+estimate appears.}
 \label{tab:baseline}
 \centering
 \begin{tabular}{lrrrr}
 \toprule
-Target alarms per worn hour & False positive rate & Window recall &
+Alarms per worn hour & False positive rate & Window recall &
 Episode recall & Seed range \\
 \midrule
 0.5 & 0.018 & 0.087 & 0.029 & 0.000 \\
@@ -367,24 +424,57 @@ Episode recall & Seed range \\
 \end{tabular}
 \end{table}
 
-The model attains AUC $0.7654$ with a seed range of $0.0095$, and average
-precision $0.685$ against a sampled prevalence of $0.436$. Table
+The model attains AUC $0.7654$ with a seed range of $0.0095$. Table
 \ref{tab:baseline} translates this into operating points.
 
-\paragraph{The gap is the finding.} An AUC of 0.765 means the model reliably
-ranks stressed windows above unstressed ones. At one false alarm per worn hour,
-it recovers 10.6\% of episodes. AUC integrates over false positive rates
+\paragraph{The gap is the finding.} An AUC of $0.765$ means the model reliably
+ranks stressed windows above unstressed ones. At one false alarm per worn hour
+it recovers \SI{10.6}{\percent} of episodes, with a seed range of $0.072$ that
+is comparable to the estimate itself. AUC integrates over false positive rates
 including regions no deployment would tolerate; once constrained to the usable
-corner, little remains. Two of ten subjects detect zero episodes at any usable
-threshold, and one is below chance at AUC 0.388.
+corner, little remains. Two of ten participants detect zero episodes at any
+usable threshold, and one is below chance at AUC $0.388$. We report per fold
+and never average; fold AUC ranges from $0.388$ to $0.885$.
 
-We report per fold and never average. Fold AUC ranges from 0.388 to 0.885.
+\subsection{Two controls}
+
+\begin{table}[t]
+\caption{Controls. The permutation null shuffles labels within participant,
+preserving class balance, fold structure and feature distributions while
+destroying only the label-feature correspondence.}
+\label{tab:controls}
+\centering
+\begin{tabular}{lrr}
+\toprule
+ & AUC & Episode recall at 1 alarm/hour \\
+\midrule
+Gradient boosting        & 0.7655 & 0.1063 \\
+Logistic regression      & 0.7502 & 0.0942 \\
+\midrule
+Permutation null (mean of 20) & 0.4975 ($\pm 0.0099$) & --- \\
+Permutation null (maximum)    & 0.5186 & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table \ref{tab:controls} reports two controls that separate what the data
+supports from what the pipeline produces.
+
+Shuffling labels within participant yields AUC $0.4975 \pm 0.0099$ across
+twenty permutations, with a maximum of $0.5186$. The observed value exceeds
+every null draw, roughly twenty-six standard deviations above the null mean.
+The pipeline does not manufacture its own signal.
+
+A penalised logistic regression on identical folds and features reaches AUC
+$0.7502$, within $0.0153$ of the boosted model. A linear model with almost no
+capacity to overfit arrives at nearly the same place, so model capacity is not
+the binding constraint.
 
 \section{Does a different treatment of the labels help?}
 \label{sec:pu}
 
-We pre-registered a decision rule before computing the following, and record it
-here in the form it was written:
+We fixed a decision rule before computing the following, and record it here as
+written:
 
 \begin{quote}
 Proceed to representation learning only if a different label treatment moves
@@ -393,18 +483,23 @@ of $0.0724$.
 \end{quote}
 
 The threshold is the baseline's own measured seed range rather than a chosen
-constant. We compare three treatments on identical folds, windows, and
-features: the curated negatives of Section \ref{sec:negatives}; a naive
-comparator treating all unlabelled time as negative, with no same-day rule,
-guard band, or matching; and non-negative positive-unlabelled risk estimation
-\cite{kiryo2017} fitted subject-stratified, with the class prior bracketed
+constant. We note that this makes the rule generous in one direction: a noisier
+baseline sets a higher bar and is easier to leave uncleared.
+
+We compare three treatments on identical folds, windows, and features: the
+curated negatives of Section \ref{sec:negatives}; a naive comparator treating
+all unlabelled time as negative, with no same-day rule, guard band, or
+matching; and non-negative positive-unlabelled risk estimation
+\cite{kiryo2017} fitted participant-stratified, with the class prior bracketed
 rather than estimated, since it is not identifiable from positive-unlabelled
 data.
 
 \begin{table}[t]
 \caption{Label treatments on identical folds. Both reported metrics are
 prevalence-invariant, so the naive arm scored over 24{,}334 windows and the
-curated arm over 3{,}622 remain comparable.}
+curated arm over 3{,}622 remain comparable. The positive-unlabelled rows use a
+fixed training budget without an inner validation split and are marked
+accordingly; they are not tuned to the same standard as the baseline.}
 \label{tab:pu}
 \centering
 \begin{tabular}{llrr}
@@ -413,70 +508,98 @@ Treatment & Class prior & AUC & Episode recall at 1 alarm/hour \\
 \midrule
 Curated negatives (baseline) & --- & \textbf{0.7654} & \textbf{0.1063} \\
 Naive, all unlabelled negative & --- & 0.6925 & 0.0652 \\
-Non-negative PU & 0.05 & 0.6616 & 0.0435 \\
-Non-negative PU & 0.10 & 0.6933 & 0.0652 \\
-Non-negative PU & 0.20 & 0.7132 & 0.0507 \\
-Non-negative PU & 0.30 & 0.7167 & 0.0580 \\
+Non-negative PU (untuned) & 0.05 & 0.6616 & 0.0435 \\
+Non-negative PU (untuned) & 0.10 & 0.6933 & 0.0652 \\
+Non-negative PU (untuned) & 0.20 & 0.7132 & 0.0507 \\
+Non-negative PU (untuned) & 0.30 & 0.7167 & 0.0580 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Table \ref{tab:pu} gives the result. The threshold to clear was $0.1787$. The
-best alternative reached $0.0652$, a change of $-0.0411$. \textbf{The rule was
-not met, and every alternative is worse than the baseline rather than merely
-insufficiently better.}
+The threshold to clear was $0.1787$. The best alternative reached $0.0652$, a
+change of $-0.0411$. \textbf{The rule was not met, and every alternative is
+worse than the baseline rather than merely insufficiently better.}
 
 \paragraph{Curation improved rather than inflated.} This comparison is normally
 run to detect inflation: naive negatives include off-shift and sleeping time,
 the contrast becomes trivial, and the score rises. Here the curated
-construction beats naive by 0.073 AUC and 0.041 episode recall. The likely
+construction beats naive by $0.073$ AUC and $0.041$ episode recall. The likely
 mechanism is the guard band, since naive negatives include windows adjacent to
 episodes, which are physiologically similar to positives and act as label noise
-during training. The same-day rule and guard band are therefore not only
-defensibility measures; they measurably improve the model.
+during training. We have not isolated the guard band from the same-day rule,
+so we offer this as the plausible mechanism rather than a demonstrated one.
 
 \paragraph{The prior does not rescue it.} AUC rises monotonically with the
-class prior, from 0.662 to 0.717, which is the shape one could present as
-promising. Episode recall at the deployable operating point does not follow it,
-remaining between 0.044 and 0.065 throughout. We report the prior-indexed
+class prior, from $0.662$ to $0.717$, which is the shape one could present as
+promising. Episode recall at the deployable operating point does not follow,
+remaining between $0.044$ and $0.065$ throughout. We report the prior-indexed
 results in full rather than the trend alone.
 
 \section{Discussion}
 
-\subsection{What the eliminations leave}
+\subsection{What the eliminations leave, and what they do not}
 
 The labels mark a real physiological state, in one channel. The comparison
-group does not leak movement or schedule. Standard features and a standard
-learner recover one episode in ten at a deployable alarm rate. Three distinct
-treatments of the labels do not improve on this, and two make it worse.
+group leaks neither movement nor schedule. The pipeline does not manufacture
+signal, since a within-participant permutation null sits at chance. Model
+capacity is not the constraint, since a linear model matches a boosted one.
+Three treatments of the labels do not improve on the baseline, and two make it
+worse.
 
-What remains is the data. There are 138 episodes from 10 subjects; the labels
-are retrospective self-reports of intervals, treated here as uniform states
-although a thirty-minute report is unlikely to describe thirty uniform minutes;
-the negative class is constructed rather than observed; and only one of four
-channels responds at onset.
+\textbf{What we have eliminated is the label-treatment axis, not the
+representation axis.} Our decision rule tested whether a different way of
+\emph{using} the labels helps. Self-supervised pretraining asks a different
+question: whether a different \emph{representation} of the signal helps. The
+rule we fixed does not settle that, and we state this rather than treating the
+null as broader than it is.
+
+What we can say is narrower and still useful. Within the feature set and
+learner space we searched, the results do not move; the constraint is not
+capacity, not the comparison group, and not the pipeline. The remaining
+candidates are the representation and the data. The data-side candidates are
+concrete: 138 episodes from 10 participants; labels that are retrospective
+self-reports of intervals, treated here as uniform states although a
+thirty-minute report is unlikely to describe thirty uniform minutes; a
+constructed rather than observed negative class; and one responsive channel out
+of four.
+
+\subsection{What this implies for the pretraining we did not run}
+
+A label-efficiency comparison remains the informative experiment, and it is
+worth stating what it would need. The measurement is not whether a pretrained
+encoder beats hand-crafted features outright, which is unlikely at 138
+episodes, but whether it reaches a given level with fewer of them. That curve
+would separate a label-supply constraint from a representation constraint
+directly.
+
+Two preconditions follow from our results. The participant-identity probe must
+be compared against $0.768$, the accuracy reachable from sensible hand-crafted
+features, and not against chance; an encoder scoring near $0.95$ would have
+learned identity rather than physiology. And pretraining on all participants
+before a leave-one-participant-out evaluation is transductive, so it must
+either be re-run inside each fold or be labelled as an upper bound.
 
 \subsection{On the reported accuracy in prior work}
 
 Mathur et al.\ \cite{mathur2024} report weighted $F_1 = 0.99$ on this dataset.
-We do not reproduce this and we think it is difficult to reconcile with
-subject-grouped evaluation. Adjacent windows in these recordings share raw
-samples and subject-specific baselines; a split that does not respect subject
-boundaries places near-duplicates on both sides. We are not in a position to
-diagnose another group's protocol from a published summary, and we note the
-discrepancy rather than attributing a cause. We report our own protocol in full
-so that the comparison can be made.
+We do not reproduce this and think it is difficult to reconcile with
+participant-grouped evaluation. Adjacent windows in these recordings share raw
+samples and participant-specific baselines; a split that does not respect
+participant boundaries places near-duplicates on both sides. We are not in a
+position to diagnose another group's protocol from a published summary, and we
+note the discrepancy rather than attributing a cause. We report our own
+protocol in full so that the comparison can be made.
 
 \subsection{What a future collection would need}
 
-The most actionable consequence concerns label supply rather than modelling.
-A collection targeting this task should record explicit non-stress intervals,
-since their absence forces every downstream number to be conditional on a
-construction; should capture onset with finer resolution than a retrospective
-interval; and should prioritise electrodermal signal quality, since four of
-fifteen subjects here produced a flat trace on the only responsive channel.
-Heart rate contributed nothing measurable at onset in this cohort, and
-inter-beat intervals were usable in under 6\% of windows.
+The most actionable consequence concerns label supply. A collection targeting
+this task should record explicit non-stress intervals, since their absence
+forces every downstream number to be conditional on a construction; should
+capture onset with finer resolution than a retrospective interval; and should
+prioritise electrodermal signal quality, since four of fifteen participants
+here produced a flat trace on the only responsive channel. Heart rate
+contributed nothing measurable at onset in this cohort, and inter-beat
+intervals were usable in under \SI{6}{\percent} of windows.
 
 \section{Limitations}
 
@@ -485,25 +608,35 @@ and external validity is correspondingly narrow. Negatives are constructed, so
 precision is not reported as a performance claim: when the model flags an
 unlabelled window we cannot distinguish a false alarm from an unreported
 episode. The class prior is not identifiable and is bracketed rather than
-estimated. Our non-negative PU implementation uses a fixed training budget
-without an inner validation split, so its negative result is weaker evidence
-than the naive comparator, which shares the baseline's learner and features and
-differs only in label treatment. Thirty-three rated episodes have no sensor
-coverage and are absent from every metric. Two normalisation constants, the
-denominator floor and the output clip, are choices we record and vary rather
-than defend. Ten folds is underpowered for the paired comparisons we report,
-and we state spreads descriptively rather than dividing them by the square root
-of the fold count.
+estimated. Our non-negative positive-unlabelled implementation uses a fixed
+training budget without an inner validation split, so its negative result is
+weaker evidence than the naive comparator, which shares the baseline's learner
+and features and differs only in label treatment. We searched two learners and
+one feature set; a sequence model over raw windows is untested. Thirty-three
+rated episodes have no sensor coverage and are absent from every metric. Two
+normalisation constants, the denominator floor and the output clip, are choices
+we record and vary rather than defend. Ten folds is underpowered for the paired
+comparisons we report, and we state spreads descriptively rather than dividing
+them by the square root of the fold count. The permutation null uses twenty
+draws, so its $p$-value floor is $0.048$; the observed value exceeds every draw
+but a finer resolution would require more permutations.
 
 \section{Conclusion}
 
-We set out to determine whether the ceiling on wearable stress detection in
-this dataset lies in the method or in the data, and answered by elimination.
-The labels are real, the comparison group is sound, the baseline is honest, and
-three ways of using the labels differently do not move it. The binding
-constraint is the label supply. We report this as a result rather than a
-failure, because the quantity a future study most needs from this one is not a
-score but a measurement of what was missing.
+We intended to test whether self-supervised pretraining helps when
+\SI{90.9}{\percent} of the data is unlabelled. Establishing the prerequisites
+consumed the study, and the prerequisites turned out to be the result. The
+labels mark a real state in one channel. A comparison group can be built that
+survives falsification. A baseline built on it clears a permutation null
+decisively and still recovers one episode in ten at a deployable alarm rate,
+and neither a different learner nor three different treatments of the labels
+move it.
+
+We report this as a result rather than a failure, and we are explicit about its
+boundary: we have eliminated the label-treatment axis, not the representation
+axis. What a future study most needs from this one is not a score but a
+measurement of what was missing, and the most useful next experiment is a
+label-efficiency curve rather than another point estimate.
 
 \begin{ack}
 We thank the authors of the source dataset for making it publicly available.
