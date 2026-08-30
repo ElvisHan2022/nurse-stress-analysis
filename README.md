@@ -31,3 +31,6 @@ Original work lives in `my_work/`.
 (`tasks/audit_a*.py`) against the plan documents and supersedes the Phase 0
 fact tables in both `PLAN.md` and `PLAN_v2.md`. Start there before trusting a
 number quoted anywhere else in this repo.
+
+`CONTRIBUTING.md` records the conventions we work and write to — what is frozen,
+how numbers are quoted, and the register the paper is written in.
