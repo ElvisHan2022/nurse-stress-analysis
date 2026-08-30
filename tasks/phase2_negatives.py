@@ -29,7 +29,10 @@ from audit_common import OUT, DERIVED, LOCAL_TZ, load_survey, banner
 WINDOW_S = 120
 MIN_SESSION_MIN = 30
 GUARD_MIN = 30
-RATIO = 2.14                 # v3 decision point 8, min achievable on this cohort
+RATIO = 1.31                 # min achievable under BIN matching (audit A11 + phase2 ceiling
+                             # analysis). 2.14 was computed on totals and left a
+                             # 1.64x spread across folds; 1.31 halves it to 1.28x.
+                             # Exact uniformity needs r~0.54 and is not usable.
 N_BINS = 10
 SEEDS = [0, 1, 2]
 
