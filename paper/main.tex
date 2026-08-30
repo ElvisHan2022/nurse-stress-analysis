@@ -34,29 +34,32 @@ Nurse Stress from Wearables}
 \maketitle
 
 \begin{abstract}
-Wearable sensors promise a continuous alternative to questionnaires for
-measuring occupational stress, and self-supervised pretraining is the standard
-response when those recordings are mostly unlabelled. We set out to
-apply it to a public dataset of fifteen hospital nurses, each recorded for a
-week during the COVID-19 pandemic, who reported stressful episodes on a
-smartphone as they occurred. Ninety-one percent of the recorded sensor time
-carries no label. Pretraining cannot be evaluated without a supervised baseline
-worth improving on, and building one requires examples of unstressed time that
-this protocol never collected, since all 358 survey entries mark an episode a
-nurse chose to flag and the number attached is its severity rather than its
-presence. This paper reports the attrition required to construct both, from 609
-recordings and fifteen participants down to 138 episodes from ten, testing at
-each step whether what survived is real rather than manufactured.
-Skin conductance rises at reported onset in 64.3\% of episodes ($p=0.0009$),
-while heart rate is indistinguishable from chance ($p=0.80$). A comparison group built by activity-matched sampling detects
-neither movement nor shift schedule (both AUC $0.51$), and a baseline trained on
-it reaches AUC $0.765$ against a within-participant permutation null of
-$0.497\pm0.010$, recovering 10.6\% of episodes at one false alarm per worn
-hour. Pretraining over 1,238 unlabelled hours then matches random
-initialisation at every label count from 25 to 138 episodes, and both trail the
-hand-crafted baseline by $0.11$ AUC. Severity prediction, which needs no
-constructed negatives, is also at chance. What limits this dataset is the
-supply of labels, and pretraining at this scale does not substitute for it.
+Wearable sensors record continuously, so a week on a nurse's wrist produces far
+more physiology than anyone will label, and self-supervised pretraining is the
+standard way to use the remainder. We ask what has to hold before that is worth
+attempting. The setting is a public dataset of fifteen hospital nurses
+monitored during the COVID-19 pandemic, 1{,}251.7 hours of recording against
+358 self-reported stress episodes, leaving 91\% of the recorded time
+unlabelled. Pretraining is only meaningful against a supervised baseline worth
+improving on, and none is available here. Nurses logged an episode in a
+smartphone application when they noticed stress and were never prompted to
+record a calm period, so every entry marks stress and the number attached is
+its severity rather than its presence. Building a baseline therefore means
+constructing the unstressed class the collection never captured, and that
+construction is what this paper reports. From 609 recordings and fifteen
+participants we arrive at 138 episodes from ten, testing at each step whether
+what survives is real rather than manufactured. Skin conductance rises at
+reported onset in 64.3\% of episodes ($p=0.0009$), while heart rate is
+indistinguishable from chance ($p=0.80$). A comparison group built by
+activity-matched sampling detects neither movement nor shift schedule (both AUC
+$0.51$), and a baseline trained on it reaches AUC $0.765$ against a
+within-participant permutation null of $0.497\pm0.010$, recovering 10.6\% of
+episodes at one false alarm per worn hour. Pretraining over 1,238 unlabelled
+hours then matches random initialisation at every label count from 25 to 138
+episodes, and both trail the hand-crafted baseline by $0.11$ AUC. Severity
+prediction, which needs no constructed negatives, is also at chance. What
+limits this dataset is the supply of labels, and pretraining at this scale does
+not substitute for it.
 \end{abstract}
 
 \section{Introduction}
@@ -137,8 +140,9 @@ fawaz2019, fawaz2020} and are easy to omit in a way that flatters a deep
 model \cite{zeng2022}.
 
 
-We therefore report the study as a sequence of eliminations, each
-narrowing what is left. Section \ref{sec:labels} asks whether the labels
+The eliminations that follow are not an audit of the deposit for its own
+sake. Each removes a way the final comparison could go wrong, so that the
+baseline a learned representation must beat is one we can defend. Section \ref{sec:labels} asks whether the labels
 mark anything physiological, and finds one channel of four responds at
 onset. Section \ref{sec:negatives} constructs the comparison group and
 finds, against the usual warning, that careful construction improves
