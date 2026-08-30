@@ -1,0 +1,11 @@
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.synctex.gz
+_tmpl/*.pdf
+_tmpl/*.aux
+_tmpl/*.log
+_tmpl/*.out
+_tmpl/measure.tex

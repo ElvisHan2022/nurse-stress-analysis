@@ -1,0 +1,49 @@
+% measure_only.sty
+%
+% NOT FOR SUBMISSION. This reproduces only the NeurIPS 2026 page geometry and
+% type size so that page count can be measured before the official style file
+% is obtained. It deliberately implements nothing else: no line numbers, no
+% title block styling, no footer.
+%
+% The NeurIPS instructions state that the only supported style file is
+% neurips_2026.sty from neurips.cc, and that tweaking style files may be
+% grounds for desk rejection. This file is a ruler, not a substitute.
+%
+% Geometry per the instructions: US Letter, text block 5.5in x 9.0in,
+% 10pt type on 11pt leading.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{measure_only}[2026/08/30 page-count measurement only]
+
+\DeclareOption{final}{}
+\DeclareOption{preprint}{}
+\DeclareOption{nonatbib}{}
+\ProcessOptions\relax
+
+\RequirePackage{geometry}
+\geometry{
+  letterpaper,
+  textwidth=5.5in,
+  textheight=9.0in,
+  top=1.0in,
+  left=1.5in,
+  headheight=12pt,
+  headsep=25pt,
+  footskip=30pt
+}
+
+\renewcommand{\normalsize}{\fontsize{10}{11}\selectfont}
+\normalsize
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5\baselineskip}
+
+% Author block macros the document uses.
+\providecommand{\And}{\hspace{2em}}
+\providecommand{\AND}{\\}
+
+\RequirePackage{natbib}
+
+\pagestyle{plain}
+
+\endinput

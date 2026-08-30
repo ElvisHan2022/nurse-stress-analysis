@@ -1,0 +1,542 @@
+Formatting Instructions For NeurIPS 2026
+Anonymous Author(s)
+Affiliation
+Address
+email
+Abstract
+The abstract paragraph should be indented 1/2 inch (3 picas) on both the left- and1
+right-hand margins. Use 10 point type, with a vertical spacing (leading) of 11 points.2
+The wordAbstractmust be centered, bold, and in point size 12. Two line spaces3
+precede the abstract. The abstract must be limited to one paragraph.4
+1 Submission of papers to NeurIPS 20265
+Please read the instructions below carefully and follow them faithfully.6
+1.1 Style7
+Papers to be submitted to NeurIPS 2026 must be prepared according to the instructions presented here.8
+Papers may only be up toninepages long, including figures.Papers that exceed the page limit will9
+not be reviewed (or in any other way considered) for presentation at the conference.Additional10
+pagescontaining acknowledgments, references, checklist, and optional technical appendicesdo not11
+count as content pages.12
+The margins in 2026 are the same as those in previous years.13
+Authors are required to use the NeurIPS L ATEX style files obtainable at the NeurIPS website as14
+indicated below. Please make sure you use the current files and not previous versions. Tweaking the15
+style files may be grounds for desk rejection.16
+1.2 Retrieval of style files17
+The style files for NeurIPS and other conference information are available on the website at18
+https://neurips.cc.19
+The only supported style file for NeurIPS 2026 is neurips_2026.sty, rewritten for LATEX 2ε.20
+Previous style files for LATEX 2.09, Microsoft Word, and RTF are no longer supported.21
+The LATEX style file contains three optional arguments:22
+•final, which creates a camera-ready copy,23
+•preprint, which creates a preprint for submission to, e.g., arXiv,24
+•nonatbib, which will not load thenatbibpackage for you in case of package clash.25
+Preprint optionIf you wish to post a preprint of your work online, e.g., on arXiv, using the26
+NeurIPS style, please use the preprint option. This will create a nonanonymized version of your27
+work with the text “Preprint. Work in progress.” in the footer. This version may be distributed as you28
+Submitted to 40th Conference on Neural Information Processing Systems (NeurIPS 2026). Do not distribute.
+see fit, as long as you do not say which conference it was submitted to. Pleasedo notuse the final29
+option, which shouldonlybe used for papers accepted to NeurIPS.30
+At submission time, please omit the final and preprint options. This will anonymize your31
+submission and add line numbers to aid review. Please donotrefer to these line numbers in your32
+paper as they will be removed during generation of camera-ready copies.33
+The file neurips_2026.tex may be used as a “shell” for writing your paper. All you have to do is34
+replace the author, title, abstract, and text of the paper with your own.35
+The formatting instructions contained in these style files are summarized in Sections 2, 3, and 436
+below.37
+2 General formatting instructions38
+The text must be confined within a rectangle 5.5 inches (33 picas) wide and 9 inches (54 picas) long.39
+The left margin is 1.5 inch (9 picas). Use 10 point type with a vertical spacing (leading) of 11 points.40
+Times New Roman is the preferred typeface throughout, and will be selected for you by default.41
+Paragraphs are separated by 1/2line space (5.5 points), with no indentation.42
+The paper title should be 17 point, initial caps/lower case, bold, centered between two horizontal43
+rules. The top rule should be 4 points thick and the bottom rule should be 1 point thick. Allow 1/4 inch44
+space above and below the title to rules. All pages should start at 1 inch (6 picas) from the top of the45
+page.46
+For the final version, authors’ names are set in boldface, and each name is centered above the47
+corresponding address. The lead author’s name is to be listed first (left-most), and the co-authors’48
+names (if different address) are set to follow. If there is only one co-author, list both author and49
+co-author side by side.50
+Please pay special attention to the instructions in Section 4 regarding figures, tables, acknowledgments,51
+and references.52
+3 Headings: first level53
+All headings should be lower case (except for first word and proper nouns), flush left, and bold.54
+First-level headings should be in 12-point type.55
+3.1 Headings: second level56
+Second-level headings should be in 10-point type.57
+3.1.1 Headings: third level58
+Third-level headings should be in 10-point type.59
+ParagraphsThere is also a \paragraph command available, which sets the heading in bold, flush60
+left, and inline with the text, with the heading followed by 1 em of space.61
+4 Citations, figures, tables, references62
+These instructions apply to everyone.63
+4.1 Citations within the text64
+The natbib package will be loaded for you by default. Citations may be author/year or numeric, as65
+long as you maintain internal consistency. As to the format of the references themselves, any style is66
+acceptable as long as it is used consistently.67
+The documentation fornatbibmay be found at68
+2
+Figure 1: Sample figure caption. Explain what the figure shows and add a key take-away message to
+the caption.
+http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf69
+Of note is the command \citet, which produces citations appropriate for use in inline text. For70
+example,71
+\citet{hasselmo} investigated\dots72
+produces73
+Hasselmo, et al. (1995) investigated. . .74
+If you wish to load the natbib package with options, you may add the following before loading the75
+neurips_2026package:76
+\PassOptionsToPackage{options}{natbib}77
+If natbib clashes with another package you load, you can add the optional argument nonatbib78
+when loading the style file:79
+\usepackage[nonatbib]{neurips_2026}80
+As submission is double blind, refer to your own published work in the third person. That is, use “In81
+the previous work of Jones et al. [4],” not “In our previous work [4].” If you cite your other papers82
+that are not widely available (e.g., a journal paper under review), use anonymous author names in the83
+citation, e.g., an author of the form “A. Anonymous” and include a copy of the anonymized paper in84
+the supplementary material.85
+4.2 Footnotes86
+Footnotes should be used sparingly. If you do require a footnote, indicate footnotes with a number187
+in the text. Place the footnotes at the bottom of the page on which they appear. Precede the footnote88
+with a horizontal rule of 2 inches (12 picas).89
+Note that footnotes are properly typesetafterpunctuation marks. 290
+4.3 Figures91
+All artwork must be neat, clean, and legible. Lines should be dark enough for reproduction purposes.92
+The figure number and caption always appear after the figure. Place one line space before the figure93
+caption and one line space after the figure. The figure caption should be lower case (except for the94
+first word and proper nouns); figures are numbered consecutively.95
+You may use color figures. However, it is best for the figure captions and the paper body to be legible96
+if the paper is printed in either black/white or in color.97
+1Sample of the first footnote.
+2As in this example.
+3
+Table 1: Sample table caption. Explain what the table shows and add a key take-away message to the
+caption.
+Part
+Name Description Size (µm)
+Dendrite Input terminal≈100
+Axon Output terminal≈10
+Soma Cell body up to10 6
+4.4 Tables98
+All tables must be centered, neat, clean, and legible. The table number and title always appear before99
+the table. See Table 1.100
+Place one line space before the table title, one line space after the table title, and one line space after101
+the table. The table title must be lower case (except for the first word and proper nouns); tables are102
+numbered consecutively.103
+Note that publication-quality tablesdo not contain vertical rules. We strongly suggest the use of the104
+booktabspackage, which allows for typesetting high-quality, professional tables:105
+https://www.ctan.org/pkg/booktabs106
+This package was used to typeset Table 1.107
+4.5 Math108
+Note that display math in bare TeX commands will not create correct line numbers for sub-109
+mission. Please use LaTeX (or AMSTeX) commands for unnumbered display math. (You110
+really shouldn’t be using $$ anyway; see https://tex.stackexchange.com/questions/111
+503/why-is-preferable-to and https://tex.stackexchange.com/questions/40492/112
+what-are-the-differences-between-align-equation-and-displaymath for more infor-113
+mation.)114
+4.6 Final instructions115
+Do not change any aspects of the formatting parameters in the style files. In particular, do not modify116
+the width or length of the rectangle the text should fit into, and do not change font sizes. Please note117
+that pages should be numbered.118
+5 Preparing PDF files119
+Please prepare submission files with paper size “US Letter,” and not, for example, “A4.”120
+Fonts were the main cause of problems in the past years. Your PDF file must only contain Type 1 or121
+Embedded TrueType fonts. Here are a few instructions to achieve this.122
+• You should directly generate PDF files usingpdflatex.123
+• You can check which fonts a PDF files uses. In Acrobat Reader, select the menu124
+Files>Document Properties>Fonts and select Show All Fonts. You can also use the program125
+pdffonts which comes with xpdf and is available out-of-the-box on most Linux machines.126
+•xfig“patterned” shapes are implemented with bitmap fonts. Use "solid" shapes instead.127
+• The \bbold package almost always uses bitmap fonts. You should use the equivalent AMS128
+Fonts:129
+\usepackage{amsfonts}130
+followed by, e.g., \mathbb{R}, \mathbb{N}, or \mathbb{C} for R, N or C. You can also131
+use the following workaround for reals, natural and complex:132
+4
+\newcommand{\RR}{I\!\!R} %real numbers133
+\newcommand{\Nat}{I\!\!N} %natural numbers134
+\newcommand{\CC}{I\!\!\!\!C} %complex numbers135
+Note thatamsfontsis automatically loaded by theamssymbpackage.136
+If your file contains type 3 fonts or non embedded TrueType fonts, we will ask you to fix it.137
+5.1 Margins in L ATEX138
+Most of the margin problems come from figures positioned by hand using \special or other139
+commands. We suggest using the command \includegraphics from the graphicx package.140
+Always specify the figure width as a multiple of the line width as in the example below:141
+\usepackage[pdftex]{graphicx} ...142
+\includegraphics[width=0.8\linewidth]{myfile.pdf}143
+See Section 4.4 in the graphics bundle documentation ( http://mirrors.ctan.org/macros/144
+latex/required/graphics/grfguide.pdf)145
+A number of width problems arise when LATEX cannot properly hyphenate a line. Please give LaTeX146
+hyphenation hints using the\-command when necessary.147
+References148
+References follow the acknowledgments in the camera-ready paper. Use unnumbered first-level149
+heading for the references. Any choice of citation style is acceptable as long as you are consistent. It150
+is permissible to reduce the font size to small (9 point) when listing the references. Note that the151
+Reference section does not count towards the page limit.152
+[1] Alexander, J.A. & Mozer, M.C. (1995) Template-based algorithms for connectionist rule extraction. In153
+G. Tesauro, D.S. Touretzky and T.K. Leen (eds.),Advances in Neural Information Processing Systems 7, pp.154
+609–616. Cambridge, MA: MIT Press.155
+[2] Bower, J.M. & Beeman, D. (1995)The Book of GENESIS: Exploring Realistic Neural Models with the156
+GEneral NEural SImulation System.New York: TELOS/Springer–Verlag.157
+[3] Hasselmo, M.E., Schnell, E. & Barkai, E. (1995) Dynamics of learning and recall at excitatory recurrent158
+synapses and cholinergic modulation in rat hippocampal region CA3.Journal of Neuroscience15(7):5249-5262.159
+A Technical appendices and supplementary material160
+Technical appendices with additional results, figures, graphs, and proofs may be submitted with the161
+paper submission before the full submission deadline (see above). You can upload a ZIP file for162
+videos or code, but do not upload a separate PDF file for the appendix. There is no page limit for the163
+technical appendices.164
+Note: Think of the appendix as “optional reading” for reviewers. The paper must be able to stand165
+alone without the appendix; for example, adding critical experiments that support the main claims to166
+an appendix is inappropriate.167
+5
+NeurIPS Paper Checklist168
+The checklist is designed to encourage best practices for responsible machine learning research,169
+addressing issues of reproducibility, transparency, research ethics, and societal impact. Do not remove170
+the checklist:The papers not including the checklist will be desk rejected.The checklist should171
+follow the references and follow the (optional) supplemental material. The checklist does NOT count172
+towards the page limit.173
+Please read the checklist guidelines carefully for information on how to answer these questions. For174
+each question in the checklist:175
+• You should answer [Yes], [No], or [N/A].176
+• [N/A] means either that the question is Not Applicable for that particular paper or the177
+relevant information is Not Available.178
+• Please provide a short (1–2 sentence) justification right after your answer (even for [N/A]).179
+The checklist answers are an integral part of your paper submission.They are visible to the180
+reviewers, area chairs, senior area chairs, and ethics reviewers. You will also be asked to include it181
+(after eventual revisions) with the final version of your paper, and its final version will be published182
+with the paper.183
+The reviewers of your paper will be asked to use the checklist as one of the factors in their evaluation.184
+While [Yes] is generally preferable to [No], it is perfectly acceptable to answer [No] provided a185
+proper justification is given (e.g., error bars are not reported because it would be too computationally186
+expensive” or “we were unable to find the license for the dataset we used”). In general, answering187
+[No] or [N/A] is not grounds for rejection. While the questions are phrased in a binary way, we188
+acknowledge that the true answer is often more nuanced, so please just use your best judgment and189
+write a justification to elaborate. All supporting evidence can appear either in the main paper or the190
+supplemental material, provided in appendix. If you answer [Yes] to a question, in the justification191
+please point to the section(s) where related material for the question can be found.192
+IMPORTANT, please:193
+• Delete this instruction block, but keep the section heading “NeurIPS Paper Checklist",194
+•Keep the checklist subsection headings, questions/answers and guidelines below.195
+•Do not modify the questions and only use the provided macros for your answers.196
+1.Claims197
+Question: Do the main claims made in the abstract and introduction accurately reflect the198
+paper’s contributions and scope?199
+Answer:[TODO]200
+Justification:[TODO]201
+Guidelines:202
+• The answer [N/A] means that the abstract and introduction do not include the claims203
+made in the paper.204
+• The abstract and/or introduction should clearly state the claims made, including the205
+contributions made in the paper and important assumptions and limitations. A [No] or206
+[N/A] answer to this question will not be perceived well by the reviewers.207
+• The claims made should match theoretical and experimental results, and reflect how208
+much the results can be expected to generalize to other settings.209
+• It is fine to include aspirational goals as motivation as long as it is clear that these goals210
+are not attained by the paper.211
+2.Limitations212
+Question: Does the paper discuss the limitations of the work performed by the authors?213
+Answer:[TODO]214
+Justification:[TODO]215
+6
+Guidelines:216
+• The answer [N/A] means that the paper has no limitation while the answer [No] means217
+that the paper has limitations, but those are not discussed in the paper.218
+• The authors are encouraged to create a separate “Limitations” section in their paper.219
+• The paper should point out any strong assumptions and how robust the results are to220
+violations of these assumptions (e.g., independence assumptions, noiseless settings,221
+model well-specification, asymptotic approximations only holding locally). The authors222
+should reflect on how these assumptions might be violated in practice and what the223
+implications would be.224
+• The authors should reflect on the scope of the claims made, e.g., if the approach was225
+only tested on a few datasets or with a few runs. In general, empirical results often226
+depend on implicit assumptions, which should be articulated.227
+• The authors should reflect on the factors that influence the performance of the approach.228
+For example, a facial recognition algorithm may perform poorly when image resolution229
+is low or images are taken in low lighting. Or a speech-to-text system might not be230
+used reliably to provide closed captions for online lectures because it fails to handle231
+technical jargon.232
+• The authors should discuss the computational efficiency of the proposed algorithms233
+and how they scale with dataset size.234
+• If applicable, the authors should discuss possible limitations of their approach to235
+address problems of privacy and fairness.236
+• While the authors might fear that complete honesty about limitations might be used by237
+reviewers as grounds for rejection, a worse outcome might be that reviewers discover238
+limitations that aren’t acknowledged in the paper. The authors should use their best239
+judgment and recognize that individual actions in favor of transparency play an impor-240
+tant role in developing norms that preserve the integrity of the community. Reviewers241
+will be specifically instructed to not penalize honesty concerning limitations.242
+3.Theory assumptions and proofs243
+Question: For each theoretical result, does the paper provide the full set of assumptions and244
+a complete (and correct) proof?245
+Answer:[TODO]246
+Justification:[TODO]247
+Guidelines:248
+• The answer [N/A] means that the paper does not include theoretical results.249
+• All the theorems, formulas, and proofs in the paper should be numbered and cross-250
+referenced.251
+• All assumptions should be clearly stated or referenced in the statement of any theorems.252
+• The proofs can either appear in the main paper or the supplemental material, but if253
+they appear in the supplemental material, the authors are encouraged to provide a short254
+proof sketch to provide intuition.255
+• Inversely, any informal proof provided in the core of the paper should be complemented256
+by formal proofs provided in appendix or supplemental material.257
+• Theorems and Lemmas that the proof relies upon should be properly referenced.258
+4.Experimental result reproducibility259
+Question: Does the paper fully disclose all the information needed to reproduce the main ex-260
+perimental results of the paper to the extent that it affects the main claims and/or conclusions261
+of the paper (regardless of whether the code and data are provided or not)?262
+Answer:[TODO]263
+Justification:[TODO]264
+Guidelines:265
+• The answer [N/A] means that the paper does not include experiments.266
+7
+• If the paper includes experiments, a [No] answer to this question will not be perceived267
+well by the reviewers: Making the paper reproducible is important, regardless of268
+whether the code and data are provided or not.269
+• If the contribution is a dataset and/or model, the authors should describe the steps taken270
+to make their results reproducible or verifiable.271
+• Depending on the contribution, reproducibility can be accomplished in various ways.272
+For example, if the contribution is a novel architecture, describing the architecture fully273
+might suffice, or if the contribution is a specific model and empirical evaluation, it may274
+be necessary to either make it possible for others to replicate the model with the same275
+dataset, or provide access to the model. In general. releasing code and data is often276
+one good way to accomplish this, but reproducibility can also be provided via detailed277
+instructions for how to replicate the results, access to a hosted model (e.g., in the case278
+of a large language model), releasing of a model checkpoint, or other means that are279
+appropriate to the research performed.280
+• While NeurIPS does not require releasing code, the conference does require all submis-281
+sions to provide some reasonable avenue for reproducibility, which may depend on the282
+nature of the contribution. For example283
+(a) If the contribution is primarily a new algorithm, the paper should make it clear how284
+to reproduce that algorithm.285
+(b) If the contribution is primarily a new model architecture, the paper should describe286
+the architecture clearly and fully.287
+(c) If the contribution is a new model (e.g., a large language model), then there should288
+either be a way to access this model for reproducing the results or a way to reproduce289
+the model (e.g., with an open-source dataset or instructions for how to construct290
+the dataset).291
+(d) We recognize that reproducibility may be tricky in some cases, in which case292
+authors are welcome to describe the particular way they provide for reproducibility.293
+In the case of closed-source models, it may be that access to the model is limited in294
+some way (e.g., to registered users), but it should be possible for other researchers295
+to have some path to reproducing or verifying the results.296
+5.Open access to data and code297
+Question: Does the paper provide open access to the data and code, with sufficient instruc-298
+tions to faithfully reproduce the main experimental results, as described in supplemental299
+material?300
+Answer:[TODO]301
+Justification:[TODO]302
+Guidelines:303
+• The answer [N/A] means that paper does not include experiments requiring code.304
+• Please see the NeurIPS code and data submission guidelines (https://neurips.cc/305
+public/guides/CodeSubmissionPolicy) for more details.306
+• While we encourage the release of code and data, we understand that this might not307
+be possible, so [No] is an acceptable answer. Papers cannot be rejected simply for not308
+including code, unless this is central to the contribution (e.g., for a new open-source309
+benchmark).310
+• The instructions should contain the exact command and environment needed to run to311
+reproduce the results. See the NeurIPS code and data submission guidelines (https:312
+//neurips.cc/public/guides/CodeSubmissionPolicy) for more details.313
+• The authors should provide instructions on data access and preparation, including how314
+to access the raw data, preprocessed data, intermediate data, and generated data, etc.315
+• The authors should provide scripts to reproduce all experimental results for the new316
+proposed method and baselines. If only a subset of experiments are reproducible, they317
+should state which ones are omitted from the script and why.318
+• At submission time, to preserve anonymity, the authors should release anonymized319
+versions (if applicable).320
+8
+• Providing as much information as possible in supplemental material (appended to the321
+paper) is recommended, but including URLs to data and code is permitted.322
+6.Experimental setting/details323
+Question: Does the paper specify all the training and test details (e.g., data splits, hyperpa-324
+rameters, how they were chosen, type of optimizer) necessary to understand the results?325
+Answer:[TODO]326
+Justification:[TODO]327
+Guidelines:328
+• The answer [N/A] means that the paper does not include experiments.329
+• The experimental setting should be presented in the core of the paper to a level of detail330
+that is necessary to appreciate the results and make sense of them.331
+• The full details can be provided either with the code, in appendix, or as supplemental332
+material.333
+7.Experiment statistical significance334
+Question: Does the paper report error bars suitably and correctly defined or other appropriate335
+information about the statistical significance of the experiments?336
+Answer:[TODO]337
+Justification:[TODO]338
+Guidelines:339
+• The answer [N/A] means that the paper does not include experiments.340
+• The authors should answer [Yes] if the results are accompanied by error bars, confidence341
+intervals, or statistical significance tests, at least for the experiments that support the342
+main claims of the paper.343
+• The factors of variability that the error bars are capturing should be clearly stated (for344
+example, train/test split, initialization, random drawing of some parameter, or overall345
+run with given experimental conditions).346
+• The method for calculating the error bars should be explained (closed form formula,347
+call to a library function, bootstrap, etc.)348
+• The assumptions made should be given (e.g., Normally distributed errors).349
+• It should be clear whether the error bar is the standard deviation or the standard error350
+of the mean.351
+• It is OK to report 1-sigma error bars, but one should state it. The authors should352
+preferably report a 2-sigma error bar than state that they have a 96% CI, if the hypothesis353
+of Normality of errors is not verified.354
+• For asymmetric distributions, the authors should be careful not to show in tables or355
+figures symmetric error bars that would yield results that are out of range (e.g., negative356
+error rates).357
+• If error bars are reported in tables or plots, the authors should explain in the text how358
+they were calculated and reference the corresponding figures or tables in the text.359
+8.Experiments compute resources360
+Question: For each experiment, does the paper provide sufficient information on the com-361
+puter resources (type of compute workers, memory, time of execution) needed to reproduce362
+the experiments?363
+Answer:[TODO]364
+Justification:[TODO]365
+Guidelines:366
+• The answer [N/A] means that the paper does not include experiments.367
+• The paper should indicate the type of compute workers CPU or GPU, internal cluster,368
+or cloud provider, including relevant memory and storage.369
+• The paper should provide the amount of compute required for each of the individual370
+experimental runs as well as estimate the total compute.371
+9
+• The paper should disclose whether the full research project required more compute372
+than the experiments reported in the paper (e.g., preliminary or failed experiments that373
+didn’t make it into the paper).374
+9.Code of ethics375
+Question: Does the research conducted in the paper conform, in every respect, with the376
+NeurIPS Code of Ethicshttps://neurips.cc/public/EthicsGuidelines?377
+Answer:[TODO]378
+Justification:[TODO]379
+Guidelines:380
+• The answer [N/A] means that the authors have not reviewed the NeurIPS Code of381
+Ethics.382
+• If the authors answer [No], they should explain the special circumstances that require a383
+deviation from the Code of Ethics.384
+• The authors should make sure to preserve anonymity (e.g., if there is a special consid-385
+eration due to laws or regulations in their jurisdiction).386
+10.Broader impacts387
+Question: Does the paper discuss both potential positive societal impacts and negative388
+societal impacts of the work performed?389
+Answer:[TODO]390
+Justification:[TODO]391
+Guidelines:392
+• The answer [N/A] means that there is no societal impact of the work performed.393
+• If the authors answer [N/A] or [No], they should explain why their work has no societal394
+impact or why the paper does not address societal impact.395
+• Examples of negative societal impacts include potential malicious or unintended uses396
+(e.g., disinformation, generating fake profiles, surveillance), fairness considerations397
+(e.g., deployment of technologies that could make decisions that unfairly impact specific398
+groups), privacy considerations, and security considerations.399
+• The conference expects that many papers will be foundational research and not tied400
+to particular applications, let alone deployments. However, if there is a direct path to401
+any negative applications, the authors should point it out. For example, it is legitimate402
+to point out that an improvement in the quality of generative models could be used to403
+generate Deepfakes for disinformation. On the other hand, it is not needed to point out404
+that a generic algorithm for optimizing neural networks could enable people to train405
+models that generate Deepfakes faster.406
+• The authors should consider possible harms that could arise when the technology is407
+being used as intended and functioning correctly, harms that could arise when the408
+technology is being used as intended but gives incorrect results, and harms following409
+from (intentional or unintentional) misuse of the technology.410
+• If there are negative societal impacts, the authors could also discuss possible mitigation411
+strategies (e.g., gated release of models, providing defenses in addition to attacks,412
+mechanisms for monitoring misuse, mechanisms to monitor how a system learns from413
+feedback over time, improving the efficiency and accessibility of ML).414
+11.Safeguards415
+Question: Does the paper describe safeguards that have been put in place for responsible416
+release of data or models that have a high risk for misuse (e.g., pre-trained language models,417
+image generators, or scraped datasets)?418
+Answer:[TODO]419
+Justification:[TODO]420
+Guidelines:421
+• The answer [N/A] means that the paper poses no such risks.422
+10
+• Released models that have a high risk for misuse or dual-use should be released with423
+necessary safeguards to allow for controlled use of the model, for example by requiring424
+that users adhere to usage guidelines or restrictions to access the model or implementing425
+safety filters.426
+• Datasets that have been scraped from the Internet could pose safety risks. The authors427
+should describe how they avoided releasing unsafe images.428
+• We recognize that providing effective safeguards is challenging, and many papers do429
+not require this, but we encourage authors to take this into account and make a best430
+faith effort.431
+12.Licenses for existing assets432
+Question: Are the creators or original owners of assets (e.g., code, data, models), used in433
+the paper, properly credited and are the license and terms of use explicitly mentioned and434
+properly respected?435
+Answer:[TODO]436
+Justification:[TODO]437
+Guidelines:438
+• The answer [N/A] means that the paper does not use existing assets.439
+• The authors should cite the original paper that produced the code package or dataset.440
+• The authors should state which version of the asset is used and, if possible, include a441
+URL.442
+• The name of the license (e.g., CC-BY 4.0) should be included for each asset.443
+• For scraped data from a particular source (e.g., website), the copyright and terms of444
+service of that source should be provided.445
+• If assets are released, the license, copyright information, and terms of use in the446
+package should be provided. For popular datasets, paperswithcode.com/datasets447
+has curated licenses for some datasets. Their licensing guide can help determine the448
+license of a dataset.449
+• For existing datasets that are re-packaged, both the original license and the license of450
+the derived asset (if it has changed) should be provided.451
+• If this information is not available online, the authors are encouraged to reach out to452
+the asset’s creators.453
+13.New assets454
+Question: Are new assets introduced in the paper well documented and is the documentation455
+provided alongside the assets?456
+Answer:[TODO]457
+Justification:[TODO]458
+Guidelines:459
+• The answer [N/A] means that the paper does not release new assets.460
+• Researchers should communicate the details of the dataset/code/model as part of their461
+submissions via structured templates. This includes details about training, license,462
+limitations, etc.463
+• The paper should discuss whether and how consent was obtained from people whose464
+asset is used.465
+• At submission time, remember to anonymize your assets (if applicable). You can either466
+create an anonymized URL or include an anonymized zip file.467
+14.Crowdsourcing and research with human subjects468
+Question: For crowdsourcing experiments and research with human subjects, does the paper469
+include the full text of instructions given to participants and screenshots, if applicable, as470
+well as details about compensation (if any)?471
+Answer:[TODO]472
+Justification:[TODO]473
+11
+Guidelines:474
+• The answer [N/A] means that the paper does not involve crowdsourcing nor research475
+with human subjects.476
+• Including this information in the supplemental material is fine, but if the main contribu-477
+tion of the paper involves human subjects, then as much detail as possible should be478
+included in the main paper.479
+• According to the NeurIPS Code of Ethics, workers involved in data collection, curation,480
+or other labor should be paid at least the minimum wage in the country of the data481
+collector.482
+15. Institutional review board (IRB) approvals or equivalent for research with human483
+subjects484
+Question: Does the paper describe potential risks incurred by study participants, whether485
+such risks were disclosed to the subjects, and whether Institutional Review Board (IRB)486
+approvals (or an equivalent approval/review based on the requirements of your country or487
+institution) were obtained?488
+Answer:[TODO]489
+Justification:[TODO]490
+Guidelines:491
+• The answer [N/A] means that the paper does not involve crowdsourcing nor research492
+with human subjects.493
+• Depending on the country in which research is conducted, IRB approval (or equivalent)494
+may be required for any human subjects research. If you obtained IRB approval, you495
+should clearly state this in the paper.496
+• We recognize that the procedures for this may vary significantly between institutions497
+and locations, and we expect authors to adhere to the NeurIPS Code of Ethics and the498
+guidelines for their institution.499
+• For initial submissions, do not include any information that would break anonymity (if500
+applicable), such as the institution conducting the review.501
+16.Declaration of LLM usage502
+Question: Does the paper describe the usage of LLMs if it is an important, original, or503
+non-standard component of the core methods in this research? Note that if the LLM is used504
+only for writing, editing, or formatting purposes and doesnotimpact the core methodology,505
+scientific rigor, or originality of the research, declaration is not required.506
+Answer:[TODO]507
+Justification:[TODO]508
+Guidelines:509
+• The answer [N/A] means that the core method development in this research does not510
+involve LLMs as any important, original, or non-standard components.511
+• Please refer to our LLM policy in the NeurIPS handbook for what should or should not512
+be described.513
+12
