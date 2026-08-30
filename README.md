@@ -34,3 +34,6 @@ number quoted anywhere else in this repo.
 
 `CONTRIBUTING.md` records the conventions we work and write to — what is frozen,
 how numbers are quoted, and the register the paper is written in.
+
+**New session? Read [](HANDOVER.md) first.** It carries the current
+state, how to run things, what is open, and the traps already hit.
