@@ -28,3 +28,4 @@ texput.log
 derived/pretrain_corpus.npz
 derived/phase5_windows.npz
 paper/_tmpl/*.log
+c.log
