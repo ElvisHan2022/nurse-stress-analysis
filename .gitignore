@@ -22,3 +22,6 @@ __pycache__/
 
 # Audit intermediates - regenerate with tasks/audit_a*.py
 Eric/cache/
+
+# stray LaTeX output at repo root
+texput.log
