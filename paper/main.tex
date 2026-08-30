@@ -36,32 +36,30 @@ Nurse Stress from Wearables}
 \begin{abstract}
 Wearable sensors record continuously, so a week on a nurse's wrist produces far
 more physiology than anyone will label, and self-supervised pretraining is the
-standard way to use the remainder. We study a public dataset of fifteen hospital
-nurses monitored during the COVID-19 pandemic, 1{,}251.7 hours of recording
-against 358 self-reported episodes, leaving 91\% of the time unlabelled. In this paper we take that ten-to-one imbalance of
-unlabelled to labelled time, together with the absence of any recorded
-unstressed state, as the starting conditions for
-carrying wearable stress detection from a supervised setting into a
-self-supervised one. We construct a comparison group by activity-matched
-sampling within participant, check it with falsification probes, establish a
-hand-crafted baseline, compare three label treatments including non-negative
-positive-unlabelled estimation, and pretrain a masked-reconstruction encoder
-over the unlabelled remainder to measure label efficiency against it. Nurses logged an episode in a smartphone
-application when they noticed stress and were never prompted to record a calm
-period, so every entry marks stress and the number attached is severity rather
-than presence. From 609 recordings and fifteen participants we arrive at 138 episodes from
-ten, testing at each step whether what survives is real. Skin conductance rises at reported onset in
-64.3\% of episodes ($p=0.0009$), while heart rate is indistinguishable from
-chance ($p=0.80$). The comparison group detects neither movement nor shift
-schedule (both AUC $0.51$), and the baseline reaches AUC $0.765$ against a
-within-participant permutation null of $0.497\pm0.010$, recovering 10.6\% of
-episodes at one false alarm per worn hour. Pretraining over 1,238 unlabelled
-hours then matches random initialisation at every label count from 25 to 138
-episodes, and both trail the hand-crafted baseline by $0.11$ AUC. Severity
-prediction, which needs no constructed negatives, is also at chance. We find
-that no treatment of the labels and no learned representation improves on a
-hand-crafted baseline, implying that the constraint here is the annotation
-a protocol collects rather than the volume of signal it records.
+standard way to use the remainder. We study a public dataset of fifteen
+hospital nurses monitored during the COVID-19 pandemic, 1{,}251.7 hours of
+recording against 358 self-reported episodes, leaving 91\% of the time
+unlabelled and no record anywhere of a nurse being unstressed. In this paper we
+take that ten-to-one imbalance of unlabelled to labelled time, together with
+the absent negative class, as the starting conditions for carrying wearable
+stress detection from a supervised setting into a self-supervised one. We
+construct a comparison group by activity-matched sampling within participant,
+check it with falsification probes, establish a hand-crafted baseline, compare
+three label treatments including non-negative positive-unlabelled estimation,
+and pretrain a masked-reconstruction encoder over the unlabelled remainder to
+measure label efficiency against it. Ultimately we find that pretraining over
+1,238 unlabelled hours matches random initialisation at every label count from
+25 to 138 episodes, and that neither it nor any treatment of the labels
+improves on the baseline, suggesting that progress in this setting will come
+from collection protocols that record calm periods rather than from larger
+models or more unlabelled data. Along the way we establish that the labels mark
+a physiological state in one channel only, skin conductance rising at reported
+onset in 64.3\% of episodes ($p=0.0009$) where heart rate does not
+($p=0.80$), that the comparison group detects neither movement nor shift
+schedule, and that the baseline reaches AUC $0.765$ against a
+within-participant permutation null of $0.497$ while recovering 10.6\% of
+episodes at one false alarm per worn hour. Severity prediction, which needs no
+constructed negatives, is at chance as well.
 \end{abstract}
 
 \section{Introduction}
