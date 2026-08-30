@@ -19,7 +19,7 @@
 \usepackage{graphicx}
 \usepackage{xcolor}   % \answerYes/No/NA use \textcolor
 
-\title{You Can't Pretrain Your Way Out of a Missing Negative Class:\\
+\title{We Couldn't Pretrain Our Way Out of a Missing Negative Class:\\
 Nurse Stress Detection from Wearables}
 
 \author{%
@@ -94,7 +94,12 @@ what makes the resulting data trainable, and it is the thing a dataset built on
 spontaneous self-report does not have: participants record episodes, not their
 absence. Published work on this cohort inherits the problem. Mathur et al.\
 \cite{mathur2024} report a weighted $F_1$ of $0.99$ for two-level
-classification on it.
+classification on it. We do not reproduce anything close to it, and
+each step of the attrition that separates us from it is a place where a
+number can be inflated without anyone noticing: adjacent analysis windows
+are near-duplicates of one another, the negative class is invented, and
+the effective sample size is 138 episodes from 10 people rather than the
+24{,}334 windows those episodes generate.
 
 Only 9.1\% of the 1{,}251.7 recorded hours falls inside a reported episode. The
 remaining 90.9\% is unlabelled physiology, which is the regime self-supervised
@@ -110,49 +115,38 @@ participant flagged, so the annotation records severity, not presence. The
 comparison group has to be constructed from unlabelled time, and constructing
 it defensibly turned out to be the study.
 
-Almost all wearable stress detection is supervised. A model is shown windows
-labelled stressed or not and learns the mapping, which works when the protocol
-supplies both labels. Self-supervised learning is the standard answer when
-labels are scarce, and in medicine it is established rather than novel; a
-review of the area \cite{krishnan2022} spans electronic health records, medical
-images, and bioelectrical signals. The weight of that work sits in imaging,
-where a systematic review of classification alone screened 412 studies
-\cite{huang2023}. Ambulatory wearable physiology has attracted far less of it,
-and occupational stress recorded by spontaneous self-report has attracted
-almost none. That gap is what made this dataset look like an opportunity, and
-this paper is what we found when we tried to prepare it for the task.
+Self-supervised learning is the standard answer when labels are scarce,
+and in medicine it is established rather than novel \cite{krishnan2022},
+though the weight of that work sits in imaging \cite{huang2023} rather
+than in ambulatory wearable physiology, and almost none of it in
+occupational stress recorded by spontaneous self-report. That gap is what
+made this dataset look like an opportunity.
 
-The pretext tasks themselves are mature. Masked reconstruction
-\cite{zerveas2021} and contrastive learning over augmented views
-\cite{yue2021} are the two dominant families for time series, patch-based
-encoders \cite{nie2022} are now common, and both families have been applied to
+The pretext tasks themselves are mature: masked reconstruction
+\cite{zerveas2021}, contrastive learning over augmented views
+\cite{yue2021} and patch-based encoders \cite{nie2022} are all
+established for time series, and the families have been applied to
 free-living wearable recordings \cite{spathis2020, tang2020}. Two of our
-choices follow. We use masked reconstruction, because the standard contrastive
-augmentations include amplitude scaling and skin conductance amplitude is the
-one signal Section \ref{sec:labels} finds responsive. And we keep hand-crafted
-features as the reference throughout, because strong classical baselines remain
-hard to beat on time series \cite{dempster2020, fawaz2019, fawaz2020} and are
-easy to leave out in a way that flatters a deep model \cite{zeng2022}.
+choices follow. We use masked reconstruction, because the standard
+contrastive augmentations include amplitude scaling and skin conductance
+amplitude is the one signal Section \ref{sec:labels} finds responsive. And
+we keep hand-crafted features as the reference, because strong classical
+baselines remain hard to beat on time series \cite{dempster2020,
+fawaz2019, fawaz2020} and are easy to omit in a way that flatters a deep
+model \cite{zeng2022}.
 
-We do not reproduce anything close to that figure, and each step of the
-attrition that separates us from it is a place where a number can be inflated
-without anyone noticing:
-adjacent analysis windows are near-duplicates of one another, the negative
-class is invented, and the effective sample size is 138 episodes from 10 people
-rather than the 24{,}334 windows those episodes generate.
 
-We therefore report the study as a sequence of eliminations, each narrowing
-what is left. Section \ref{sec:labels} asks whether the labels mark anything
-physiological, and finds that one of four channels responds at onset while the
-others do not, which reorders the feature priorities for this sensor. Section
-\ref{sec:negatives} constructs the comparison group with falsification probes
-and finds that careful construction improves rather than inflates performance,
-against the usual warning. Section \ref{sec:baseline} measures how far standard
-features and a standard learner get, and whether the pipeline can manufacture
-its own signal. Section \ref{sec:pu} tests three treatments of the labels
-against a rule fixed before results were seen. Section \ref{sec:ssl} tests a
-learned representation over 1{,}238 unlabelled hours, with the comparison
-biased in its favour. What is left at the end is the data.
+We therefore report the study as a sequence of eliminations, each
+narrowing what is left. Section \ref{sec:labels} asks whether the labels
+mark anything physiological, and finds one channel of four responds at
+onset. Section \ref{sec:negatives} constructs the comparison group and
+finds, against the usual warning, that careful construction improves
+rather than inflates performance. Sections \ref{sec:baseline} and
+\ref{sec:pu} measure how far standard features and a standard learner
+get, and whether a different treatment of the labels helps, against a rule
+fixed before results were seen. Section \ref{sec:ssl} tests a learned
+representation over 1{,}238 unlabelled hours, with the comparison biased
+in its favour. What is left at the end is the data.
 
 \section{Data, units, and what survives}
 \label{sec:data}
@@ -511,10 +505,10 @@ The rule above tested how the labels are \emph{used}. Self-supervision asks
 whether a different \emph{representation} helps, which is a different axis, so
 we ran it past our own stopping point.
 
-A dilated 1D convolutional encoder is trained by masked reconstruction over all
+A dilated 1D convolutional encoder is trained by masked reconstruction \cite{haresamudram2020} over all
 609 sessions and all 15 participants, including the five outside the supervised
 cohort, since the pretext task needs no labels. The corpus is 1{,}238 usable
-hours at 1 Hz over five causally normalised channels, giving 68k windows. Mask
+hours at 1 Hz over five causally normalised channels, giving 68k windows. That is a small corpus for this family of methods: the largest wearable self-supervision study we know of pretrains on 700{,}000 person-days \cite{yuan2024}, against roughly 52 here, so a null result at this scale does not settle the approach. Mask
 spans of 30 to 120 s are fixed a priori rather than tuned on downstream
 performance, which would leak through the selection process. Contrastive
 learning was rejected deliberately: its standard augmentations include
@@ -603,69 +597,54 @@ states although a thirty-minute report is unlikely to describe thirty uniform
 minutes. The negative class is constructed rather than observed. One of four
 channels responds at onset.
 
-This bears on the published $F_1$ of $0.99$ \cite{mathur2024}. We do not
-reproduce it and think it is difficult to reconcile with participant-grouped
-evaluation, since adjacent windows share raw samples and participant-specific
-baselines, so a split that ignores participant boundaries places near-duplicates
-on both sides. We are not able to diagnose another group's protocol from a
-published summary and note the discrepancy without attributing a cause,
-reporting our own protocol in full so the comparison can be made.
+This bears on the published $F_1$ of $0.99$ \cite{mathur2024}. We are not
+able to diagnose another group's protocol from a published summary, so we
+note the discrepancy without attributing a cause and report our own
+protocol in full so the comparison can be made.
 
-The actionable consequence concerns label supply rather than modelling. A
-collection targeting this task should record explicit non-stress intervals,
-since their absence makes every downstream number conditional on a
-construction; capture onset more finely than a retrospective interval; and
-prioritise skin conductance quality, since four of fifteen participants here
-produced a flat trace on the only responsive channel. The general form of the
-lesson is that self-supervision does not manufacture the thing this dataset
-lacks. Unlabelled data at a ratio of ten to one buys nothing when what is
-missing is not signal volume but the annotation that makes signal
-interpretable.
+The consequence is about collection rather than modelling, and one change
+matters more than the rest: record explicit non-stress intervals. Their
+absence is what makes every number here conditional on a construction we
+chose, and no volume of unlabelled recording substitutes for it.
 
 \section{Limitations}
 
 The cohort is 10 of 15 female nurses at a single hospital during a pandemic,
-so external validity is narrow. Negatives are constructed, so precision is not
-reported as a performance claim: when the model flags an unlabelled window we
-cannot distinguish a false alarm from an unreported episode. The class prior is
-not identifiable and is bracketed rather than estimated. Our positive-unlabelled
-implementation uses a fixed training budget without an inner validation split,
-so its negative result is weaker evidence than the naive comparator, which
-shares the baseline's learner and features and differs only in label treatment.
+so external validity is narrow. Negatives are constructed, so precision is not a
+performance claim: a flagged unlabelled window may be a false alarm or an
+unreported episode. The class prior is
+not identifiable and is bracketed rather than estimated. Our positive-unlabelled arm uses a
+fixed budget with no inner validation split, so its null is weaker evidence
+than the naive comparator, which differs from the baseline only in label
+treatment.
 We searched two learners and one hand-crafted feature set. Thirty-three rated
 episodes have no sensor coverage and are absent from every metric. Two
 normalisation constants, the denominator floor and the output clip, are choices
 we record and vary rather than defend. Ten folds is underpowered for the paired
-comparisons we report, and we state spreads descriptively rather than dividing
-by the square root of the fold count. The permutation null uses twenty draws,
+comparisons, so we state spreads descriptively rather than dividing by the root
+of the fold count. The permutation null uses twenty draws,
 so its $p$-value floor is $0.048$.
 
 The pretraining result carries its own qualifications. The encoder saw every
 participant, so Table \ref{tab:ssl} reports transductive upper bounds rather
 than estimates for an unseen person; per-fold pretraining is the clean
 alternative and costs ten times the compute. One architecture and one training
-budget were tried. A representation that is weak and one genuinely free of
-participant identity produce the same low probe accuracy, and we separate them
-only indirectly, through the sweep. The severity task rests on 14
+budget were tried. A weak representation and one genuinely free of
+participant identity give the same low probe accuracy; we separate them only
+indirectly, through the sweep. The severity task rests on 14
 medium-severity episodes, which is why we report cumulative links and a
 collapsed task rather than a three-class model.
 
 \section{Conclusion}
 
-We intended to test whether self-supervised pretraining helps when 90.9\% of
-the data is unlabelled. Establishing the prerequisites consumed the study, and
-the prerequisites turned out to be the result. The labels mark a real state in
-one channel. A comparison group can be built that survives falsification. A
-baseline built on it clears a permutation null decisively and still recovers
-one episode in ten at a deployable alarm rate. Neither a different learner, nor
-three different treatments of the labels, nor pretraining over 1{,}238
-unlabelled hours moves it, and severity, which needs no constructed negatives,
-is at chance as well.
-
-What a future study most needs from this one is not a score but a measurement
-of what was missing, and the answer is labels: explicit non-stress intervals,
-finer onset resolution, and skin conductance quality good enough that a
-participant's only responsive channel is not flat.
+We never reached the experiment we set out to run: establishing its
+prerequisites consumed the study, and the prerequisites turned out to be
+the result. That result is not local to this dataset. Ambulatory affect sensing is
+collected almost everywhere by asking participants to flag episodes, and a
+protocol that records only episodes cannot yield a negative class.
+Self-supervision is the standard answer to label scarcity in exactly that
+setting, and it does not answer this version of it: unlabelled hours add
+signal, not the annotation that makes signal interpretable.
 
 \begin{thebibliography}{20}
 
@@ -702,6 +681,15 @@ J.~A. Healey and R.~W. Picard.
   sensors.
 \newblock \emph{IEEE Transactions on Intelligent Transportation Systems}, 2005.
 \newblock DOI: 10.1109/TITS.2005.848368.
+
+\bibitem{haresamudram2020}
+H.~Haresamudram, A.~Beedu, V.~Agrawal, P.~L. Grady, I.~Essa,
+  J.~Hoffman, and T.~Pl\"otz.
+\newblock Masked reconstruction based self-supervision for human
+  activity recognition.
+\newblock In \emph{Proceedings of the 2020 International Symposium on
+  Wearable Computers}, pages 45--49, 2020.
+\newblock DOI: 10.1145/3410531.3414306.
 
 \bibitem{hosseini2022}
 S.~Hosseini, R.~Gottumukkala, S.~Katragadda, R.~T. Bhupatiraju, Z.~Ashkar,
@@ -802,6 +790,14 @@ G.~Zerveas, S.~Jayaraman, D.~Patel, A.~Bhamidipaty, and C.~Eickhoff.
 \newblock In \emph{Proceedings of the 27th ACM SIGKDD Conference on Knowledge
   Discovery and Data Mining}, 2021.
 \newblock DOI: 10.1145/3447548.3467401.
+
+\bibitem{yuan2024}
+H.~Yuan, S.~Chan, A.~P. Creagh, C.~Tong, A.~Acquah, D.~A. Clifton,
+  and A.~Doherty.
+\newblock Self-supervised learning for human activity recognition
+  using 700,000 person-days of wearable data.
+\newblock \emph{npj Digital Medicine}, 7:91, 2024.
+\newblock DOI: 10.1038/s41746-024-01062-3.
 
 \end{thebibliography}
 
