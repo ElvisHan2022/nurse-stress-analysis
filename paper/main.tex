@@ -141,7 +141,6 @@ baselines remain hard to beat on time series \cite{dempster2020,
 fawaz2019, fawaz2020} and are easy to omit in a way that flatters a deep
 model \cite{zeng2022}.
 
-
 The eliminations that follow are not an audit of the deposit for its own
 sake. Each removes a way the final comparison could go wrong, so that the
 baseline a learned representation must beat is one we can defend. Section \ref{sec:labels} asks whether the labels
@@ -511,9 +510,13 @@ $0.065$ throughout.
 \section{Does a learned representation help?}
 \label{sec:ssl}
 
-The rule above tested how the labels are \emph{used}. Self-supervision asks
-whether a different \emph{representation} helps, which is a different axis, so
-we ran it past our own stopping point.
+The rule above tested how the labels are \emph{used}, meaning what we do with
+an unlabelled window, whether we call it negative, weight it by an assumed
+prior, or exclude it. This section tests the \emph{representation}, meaning what
+the model reads in place of the raw window, until now eighteen hand-crafted
+features such as skin conductance response count. Here an
+encoder learns those features for itself. A null on one axis does not settle
+the other, so we ran this past our own stopping point.
 
 A dilated 1D convolutional encoder is trained by masked reconstruction \cite{haresamudram2020} over all
 609 sessions and all 15 participants, including the five outside the supervised
@@ -596,19 +599,15 @@ explanation for the rest.
 
 \section{Discussion}
 
-Seven eliminations, in the order we ran them. The labels mark a real
-physiological state, in one channel. The comparison group leaks neither
-movement nor schedule. The pipeline does not manufacture signal, since a
-within-participant permutation null sits at chance. Model capacity is not the
-constraint, since a linear model matches a boosted one. Three treatments of the
-labels do not improve on the baseline and two make it worse. A learned
-representation over 1{,}238 unlabelled hours does not improve on it either. And
-severity, which needs no constructed negatives at all, is at chance.
-
-What remains is the data. There are 138 episodes from ten participants, the
-labels are retrospective reports of intervals treated here as uniform states,
-the negative class is constructed rather than observed, and one channel of
-four responds at onset.
+Two results are worth being encouraged by. The labels mark a real
+physiological state, which retrospective self-report did not guarantee,
+legible in skin conductance at reported onset. And a comparison group
+assembled from unlabelled time survives every probe we built to break it. Three temper that. The baseline
+recovers one episode in ten at a deployable alarm rate, which is not a usable
+detector. Nothing moved it, neither a second learner nor three treatments of
+the labels nor a representation learned from 1{,}238 unlabelled hours. And
+severity, the one task needing no constructed negatives, is at chance, which
+rules out our construction as the cause.
 
 This bears on the published $F_1$ of $0.99$ \cite{mathur2024}, which we note
 without attributing a cause, since another group's protocol cannot be diagnosed
@@ -809,7 +808,6 @@ H.~Yuan, S.~Chan, A.~P. Creagh, C.~Tong, A.~Acquah, D.~A. Clifton,
 \newblock DOI: 10.1038/s41746-024-01062-3.
 
 \end{thebibliography}
-
 
 \newpage
 
