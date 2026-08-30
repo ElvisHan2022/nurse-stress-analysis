@@ -34,41 +34,38 @@ Nurse Stress Detection from Wearables}
 \maketitle
 
 \begin{abstract}
-Nine percent of this dataset is labelled. That is the condition
-self-supervised learning exists for, and it was what we set out to do: pretrain
-on the unlabelled remainder, fine-tune on the little that is annotated. But a
-pretext task cannot be evaluated without a supervised baseline to beat, and
-this dataset supplies neither a baseline nor the negative class one would need,
-because no nurse ever recorded being unstressed. All 358 survey entries mark an
-episode a nurse flagged; the number attached is its severity, not its presence.
-This paper is the attrition process required to construct both, reported as the
-result. We start from 609 recordings and 15 participants and arrive at 138
-episodes from 10, testing at each step whether what survived is real rather
-than manufactured. The labels do mark a physiological state, but in one channel
-only: skin conductance rises at reported onset in \textbf{64.3\%} of episodes
-($p=0.0009$), while heart rate rises in \textbf{48.6\%}, which is what a coin
-flip produces ($p=0.80$). The constructed comparison group survives
-falsification, detecting neither movement nor shift schedule (both AUC
-$0.51$), and the baseline built on it clears a within-participant permutation
-null decisively ($0.765$ against $0.498\pm0.010$) while still recovering only
-\textbf{10.6\%} of episodes at one false alarm per worn hour. We then ran the
-pretraining anyway. Over 1,238 unlabelled hours it matches random
-initialisation at every label count from 25 to 138 episodes, and both trail the
-hand-crafted baseline by $0.11$ AUC. Severity prediction, the one task here
-needing no constructed negatives, is also at chance. On this dataset the
-constraint is the label supply, and pretraining as we implemented it does not
-substitute for it.
+Nine percent of this dataset is labelled, which is the condition
+self-supervised learning exists for, and pretraining on the unlabelled
+remainder was the experiment we set out to run. A pretext task cannot be
+evaluated without a supervised baseline to beat, and this dataset supplies
+neither a baseline nor the negative class one would need, because no nurse ever
+recorded being unstressed. All 358 survey entries mark an episode a nurse
+flagged, and the number attached is its severity, not its presence. This paper
+reports the attrition required to construct both. We start from 609 recordings
+and 15 participants and arrive at 138 episodes from 10, testing at each step
+whether what survived is real rather than manufactured. The labels do mark a
+physiological state, but in one channel only: skin conductance rises at
+reported onset in 64.3\% of episodes ($p=0.0009$), while heart rate rises in
+48.6\%, which is what a coin flip produces ($p=0.80$). The constructed
+comparison group survives falsification, detecting neither movement nor shift
+schedule (both AUC $0.51$), and the baseline built on it clears a
+within-participant permutation null ($0.765$ against $0.498\pm0.010$) while
+recovering only 10.6\% of episodes at one false alarm per worn hour.
+Pretraining over 1,238 unlabelled hours then matches random initialisation at
+every label count from 25 to 138 episodes, and both trail the hand-crafted
+baseline by $0.11$ AUC. Severity prediction, the one task here needing no
+constructed negatives, is also at chance. On this dataset the constraint is the
+label supply, and pretraining as we implemented it does not substitute for it.
 \end{abstract}
 
 \section{Introduction}
 
 Nurse attrition and clinical error are both costly, and occupational stress is
 routinely implicated in each; it is the motivation the authors of this dataset
-give for collecting it \cite{hosseini2022}. The case for measuring stress
-continuously is therefore both an occupational-health and a patient-safety
-argument. The instrument normally used, a retrospective questionnaire, is a
-poor one: it is administered after the fact, it depends on recall, and it
-cannot resolve when during a shift the stress occurred.
+give for collecting it \cite{hosseini2022}. The instrument normally used to
+measure that stress is a retrospective questionnaire, which is administered
+after the fact, depends on recall, and cannot resolve when during a shift the
+stress occurred.
 
 Wrist-worn sensors promise to fix that. Skin conductance, heart rate, skin
 temperature, and movement can be recorded continuously and unobtrusively for a
@@ -80,51 +77,45 @@ ways that are easy to underestimate. The wrist is in constant motion, and the
 same physical exertion that raises heart rate and sweating during a stressful
 episode raises them during an unremarkable one. Ground truth stops being an
 experimenter-controlled stimulus and becomes whatever the participant remembers
-to report, when she has a moment to report it. A public dataset
-now exists for testing the idea. Hosseini et al.\ \cite{hosseini2022} recorded
-15 nurses for one week each during the COVID-19 outbreak, with periodic
-smartphone-administered stress reports alongside the sensor streams.
+to report, when she has a moment to report it. Hosseini et al.\
+\cite{hosseini2022} recorded 15 nurses for one week each during the COVID-19
+outbreak, with periodic smartphone-administered stress reports alongside the
+sensor streams, and the data are public.
 
-\paragraph{What we set out to do.} Only \textbf{9.1\%} of the 1{,}251.7 recorded
-hours falls inside a reported episode. The other \textbf{90.9\%} is unlabelled
-physiology, which is precisely the regime self-supervised learning was
-developed for: learn the structure of ordinary physiology from everything, then
-fine-tune on the little that is annotated. Our intent was that experiment.
+Only 9.1\% of the 1{,}251.7 recorded hours falls inside a reported episode. The
+remaining 90.9\% is unlabelled physiology, which is the regime self-supervised
+learning was developed for: learn the structure of ordinary physiology from
+everything, then fine-tune on the little that is annotated. That was the
+experiment we set out to run.
 
-\paragraph{What stopped us.} Two prerequisites, neither of which the dataset
-supplies. A pretext task is only meaningful against a supervised baseline worth
-improving on, and no such baseline existed for this dataset that we could
-trust. Building one requires a negative class, and there is none: every survey
-row marks an episode a participant flagged, so the annotation records severity,
-not presence. The comparison group has to be constructed from unlabelled time,
-and constructing it defensibly turned out to be the entire study.
+Two prerequisites stopped us, neither of which the dataset supplies. A pretext
+task is only meaningful against a supervised baseline worth improving on, and
+no baseline we could trust existed for this dataset. Building one requires a
+negative class, and there is none: every survey row marks an episode a
+participant flagged, so the annotation records severity, not presence. The
+comparison group has to be constructed from unlabelled time, and constructing
+it defensibly turned out to be the study.
 
-\paragraph{Why the groundwork is the contribution.} Published results on this
-dataset are strong. Mathur et al.\ \cite{mathur2024} report a weighted $F_1$ of
-$0.99$ for two-level classification. We do not reproduce anything close to it,
-and the reason we think it is worth reporting our own attrition in full is that
-each step of that attrition is a place where a number can be inflated without
-anyone noticing: adjacent analysis windows are near-duplicates of one another,
-the negative class is invented, and the effective sample size is 138 episodes
-from 10 people rather than the 24{,}334 windows those episodes generate.
+Published results on this dataset are strong. Mathur et al.\ \cite{mathur2024}
+report a weighted $F_1$ of $0.99$ for two-level classification. We do not
+reproduce anything close to it, and each step of the attrition that separates
+us from it is a place where a number can be inflated without anyone noticing:
+adjacent analysis windows are near-duplicates of one another, the negative
+class is invented, and the effective sample size is 138 episodes from 10 people
+rather than the 24{,}334 windows those episodes generate.
 
-We therefore report the study as a sequence of eliminations. Does the label
-mark anything physiological (Section \ref{sec:labels})? Does the constructed
-comparison group leak a confound (Section \ref{sec:negatives})? How far do
-standard features and a standard learner get, and can the pipeline manufacture
-its own signal (Section \ref{sec:baseline})? Does a different treatment of the
-labels help (Section \ref{sec:pu})? Does a learned representation (Section
-\ref{sec:ssl})? Each answer narrows what is left, and what is left at the end
-is the data.
-
-\paragraph{Contributions.} An onset analysis showing that one of four channels
-responds and the others do not, which reorders the feature priorities for this
-sensor. A negative-class construction with falsification probes, and the
-finding that careful construction \emph{improves} rather than inflates
-performance, against the usual warning. A decision rule fixed before results
-were seen, and the measurement that answered it. And a label-efficiency sweep
-establishing that pretraining over 1{,}238 unlabelled hours buys nothing here,
-reported with the comparison biased in its favour.
+We therefore report the study as a sequence of eliminations, each narrowing
+what is left. Section \ref{sec:labels} asks whether the labels mark anything
+physiological, and finds that one of four channels responds at onset while the
+others do not, which reorders the feature priorities for this sensor. Section
+\ref{sec:negatives} constructs the comparison group with falsification probes
+and finds that careful construction improves rather than inflates performance,
+against the usual warning. Section \ref{sec:baseline} measures how far standard
+features and a standard learner get, and whether the pipeline can manufacture
+its own signal. Section \ref{sec:pu} tests three treatments of the labels
+against a rule fixed before results were seen. Section \ref{sec:ssl} tests a
+learned representation over 1{,}238 unlabelled hours, with the comparison
+biased in its favour. What is left at the end is the data.
 
 \section{Data, units, and what survives}
 \label{sec:data}
@@ -213,8 +204,8 @@ Participants                  & as deposited                     & 15 \\
 \end{tabular}
 \end{table}
 
-\textbf{What survives is 10 participants, 24{,}334 windows, and 138
-high-severity episodes} (Table \ref{tab:attrition}). Of the three counts, only two are denominators: the
+What survives is 10 participants, 24{,}334 windows, and 138
+high-severity episodes (Table \ref{tab:attrition}). Of the three counts, only two are denominators: the
 window count is a compute statistic, the honest denominator for detecting an
 episode is 138, and for generalising to a new person it is 10.
 
@@ -406,7 +397,7 @@ Permutation null, 20 draws & \multicolumn{4}{r}{AUC $0.4975 \pm 0.0101$, max 0.5
 
 The model attains AUC $0.7654$ with a seed range of $0.0095$.
 
-\paragraph{The gap is the finding.} An AUC of $0.765$ means the model reliably
+\paragraph{From AUC to the operating point.} An AUC of $0.765$ means the model reliably
 ranks stressed windows above unstressed ones. At one false alarm per worn hour
 it recovers 10.6\% of episodes, with a seed range of $0.072$ comparable to the
 estimate itself. AUC integrates over false positive rates no deployment would
@@ -461,8 +452,8 @@ Non-negative PU (untuned) & 0.30 & 0.7167 & 0.0580 \\
 \end{table}
 
 The threshold to clear was $0.1787$; the best alternative reached $0.0652$, a
-change of $-0.0411$. \textbf{The rule was not met, and every alternative is
-worse than the baseline rather than merely insufficiently better.}
+change of $-0.0411$. The rule was not met, and every alternative is
+worse than the baseline rather than merely insufficiently better.
 
 Two things are worth separating out. \emph{Curation improved rather than
 inflated}: this comparison normally detects inflation, because naive negatives
@@ -554,8 +545,8 @@ comparable between people. Both links sit at chance, $0.4964$ for severity
 $\geq 1$ and $0.5417$ for $\geq 2$, with per-participant values from $0.300$ to
 $0.808$. Severity is not a restatement of episode length either, since its
 point-biserial correlation with duration is $-0.03$ and $-0.06$, neither
-significant. \textbf{The one task whose numbers are not conditional on a
-construction fails too}, which removes the negative construction as the
+significant. The one task whose numbers are not conditional on a
+construction fails too, which removes the negative construction as the
 explanation for the rest.
 
 \section{Discussion}
