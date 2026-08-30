@@ -62,8 +62,9 @@ substitute for it.
 
 \section{Introduction}
 
-Nurses leave the profession at rates that track measured occupational stress,
-and stressed clinicians make more errors. The case for measuring stress
+Nurse attrition and clinical error are both costly, and occupational stress is
+routinely implicated in each; it is the motivation the authors of this dataset
+give for collecting it \cite{hosseini2022}. The case for measuring stress
 continuously is therefore both an occupational-health and a patient-safety
 argument. The instrument normally used, a retrospective questionnaire, is a
 poor one: it is administered after the fact, it depends on recall, and it
@@ -223,7 +224,10 @@ episode is 138, and for generalising to a new person it is 10.
 Before building a classifier, we ask whether there is anything to classify. We
 align every episode at its reported onset, normalise each channel against the
 participant's own preceding hour, and compare the ten minutes after onset
-against the thirty before.
+against the thirty before. This admits 140 high-severity episodes, those with
+recording on both sides of onset. It is not the 138 of Table
+\ref{tab:attrition}, which additionally require analysis windows surviving the
+negative construction, and the two counts are not interchangeable.
 
 \begin{table}[t]
 \caption{Event-triggered response at reported onset, 140 episodes with usable
@@ -275,8 +279,10 @@ nothing, silence is uninformative: she may have been calm, or too busy to open
 the application. On a day she filed at least one report, she was demonstrably
 engaging with the survey, so silence through the rest of that day is evidence
 rather than absence of evidence. It is also the most expensive condition,
-cutting 24{,}334 windows to 16{,}214. All four together leave 7{,}955
-candidates, or 265.2 hours.
+cutting 24{,}334 windows to 16{,}214. All four together leave 7{,}955 candidate
+windows. Because windows overlap by half, that is 265.2 window-hours over 132.6
+hours of distinct recording, and we quote the distinct figure wherever coverage
+rather than sample size is meant.
 
 \subsection{Matching rather than filtering}
 
@@ -314,14 +320,18 @@ signal rather than to a weaker model.
 \begin{table}[t]
 \caption{Falsification probes and ratio sensitivity, mean of three seeds. All
 probes pass in all arms. AUC is prevalence-invariant, so arms with different
-denominators remain comparable.}
+denominators remain comparable. Every column uses a deliberately small
+six-feature probe set, two of acceleration, two of skin conductance, hour and
+position in session; these values are therefore not comparable with the
+18-feature baseline of Table \ref{tab:baseline}, and what matters is the
+contrast between columns within a row.}
 \label{tab:sens}
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{lrrrrrr}
 \toprule
-Arm & Participants & Balance spread & Movement only & Time only & Skin only & Full \\
+Arm & Participants & Balance spread & Movement only & Time only & Skin only & All six \\
 \midrule
 All 10, ratio 1.31   & 10 & $1.28\times$ & 0.513 & 0.507 & 0.768 & 0.749 \\
 All 10, ratio 2.14   & 10 & $1.64\times$ & 0.511 & 0.510 & 0.770 & 0.736 \\
@@ -333,9 +343,16 @@ Drop one, ratio 2.25 &  9 & $1.30\times$ & 0.517 & 0.525 & 0.765 & 0.726 \\
 
 A model given only acceleration reaches $0.513$ and one given only the hour of
 day reaches $0.507$, against chance $0.500$, in all four arms. The comparison
-group leaks neither movement nor schedule. Participant identity is recoverable
-from the same features at $0.768$ against chance $0.100$, which we record as a
-measurement rather than a failure, since physiology genuinely differs between
+group leaks neither movement nor schedule. Two skin-conductance features on
+their own reach $0.768$, above the six-feature set at $0.749$, which is the
+Section \ref{sec:labels} result arriving a second time: adding the unresponsive
+channels to this probe does not help it.
+
+Participant identity is recoverable from those same six features at an accuracy
+of $0.768$, against a chance rate of $0.100$ over ten participants. Its
+agreement to three decimals with the skin-only AUC in the same row is a
+coincidence between two unrelated quantities. We record the identity figure as
+a measurement rather than a failure, since physiology genuinely differs between
 people; it is the reference any learned representation must later be compared
 against.
 
@@ -477,9 +494,12 @@ amplitude scaling, and skin conductance amplitude is the signal Section
 \ref{sec:labels} identified.
 
 \paragraph{The identity gate.} A linear probe on frozen embeddings recovers
-participant identity at $0.168$, against chance $0.067$ and the $0.768$
-reachable from hand-crafted features. The encoder did not learn identity, so
-the phase proceeds. Whether $0.168$ instead indicates a weak representation is
+participant identity at $0.168$ against a chance rate of $0.067$, the encoder
+having been trained across all fifteen participants, while the hand-crafted
+reference of $0.768$ is a ten-way problem at chance $0.100$. The accuracies are
+not commensurable and we compare them as lift over chance: $2.5\times$ for the
+encoder against $7.7\times$ for the features. The encoder did not learn
+identity, so the phase proceeds. Whether $0.168$ instead indicates a weak representation is
 settled by the sweep.
 
 \begin{table}[t]
@@ -527,7 +547,7 @@ principle be blamed on our constructed comparison group. Severity cannot: it
 runs on 186 episodes rather than the 138 used for detection, because the
 detection task additionally requires each episode to survive the negative
 construction and the high-severity filter, while severity keeps the low- and
-medium-severity episodes it needs and requires no negatives at all. We fit cumulative binary links rather than a three-class model, because 17
+medium-severity episodes it needs and requires no negatives at all. We fit cumulative binary links rather than a three-class model, because 14
 medium-severity episodes across the cohort and six of ten participants with
 none make the middle class unlearnable, and because the rating scales are not
 comparable between people. Both links sit at chance, $0.4964$ for severity
@@ -540,14 +560,14 @@ explanation for the rest.
 
 \section{Discussion}
 
-Six eliminations, in the order we ran them. The labels mark a real
+Seven eliminations, in the order we ran them. The labels mark a real
 physiological state, in one channel. The comparison group leaks neither
 movement nor schedule. The pipeline does not manufacture signal, since a
 within-participant permutation null sits at chance. Model capacity is not the
 constraint, since a linear model matches a boosted one. Three treatments of the
 labels do not improve on the baseline and two make it worse. A learned
-representation over 1{,}238 unlabelled hours does not improve on it either, and
-neither does severity, which needs no constructed negatives.
+representation over 1{,}238 unlabelled hours does not improve on it either. And
+severity, which needs no constructed negatives at all, is at chance.
 
 What remains is the data. There are 138 episodes from 10 participants. The
 labels are retrospective self-reports of intervals, treated here as uniform
@@ -598,7 +618,7 @@ than estimates for an unseen person; per-fold pretraining is the clean
 alternative and costs ten times the compute. One architecture and one training
 budget were tried. A representation that is weak and one genuinely free of
 participant identity produce the same low probe accuracy, and we separate them
-only indirectly, through the sweep. The severity task rests on 17
+only indirectly, through the sweep. The severity task rests on 14
 medium-severity episodes, which is why we report cumulative links and a
 collapsed task rather than a three-class model.
 
